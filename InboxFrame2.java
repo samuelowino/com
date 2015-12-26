@@ -540,6 +540,7 @@ public class InboxFrame2 extends JFrame {
                 }
         );
         
+        /**
         //INBOX PANEL CODE GOES HERE
         allComboBox = new JComboBox(typesOfMesssages);
         lineInboxLabelBorder =  new LineBorder(Color.BLACK,1);
@@ -602,7 +603,7 @@ public class InboxFrame2 extends JFrame {
                 searchField.setEditable(true);
             }
         }
-        );
+        );**/
         //ADD SPLIT PANE AND MENU BAR TO THE 
         add(splitPane);
         setJMenuBar(menuBar);
