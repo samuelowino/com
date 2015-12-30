@@ -1,5 +1,5 @@
 package com;
-//this is the code for the spalsh screen....
+//this is the code for the splash screen. This code is [art of the overal project iNBox(Intelligent Mail Box)...
 
 import java.awt.Color;
 import javax.swing.ImageIcon;
@@ -122,15 +122,15 @@ public class SplashScreenFrame extends JFrame {
             splashWaitTime = 100;
             
         } else if (levelOfTask <= 83 && levelOfTask > 79) {
-            splashWaitTime = 2000;
+            splashWaitTime =1;
             
         } else if (levelOfTask <= 85 && levelOfTask > 83) {
             
-            splashWaitTime = 1000;
+            splashWaitTime = 1;
             
         } else if (levelOfTask <= 100 && levelOfTask > 85) {
             
-            splashWaitTime = 1500;
+            splashWaitTime = 1;
         }
 
         return splashWaitTime;
