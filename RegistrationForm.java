@@ -7,7 +7,6 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.Component;
 import java.awt.Font;
 
 import javax.swing.border.BevelBorder;
@@ -18,7 +17,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.ImageIcon;
-import javax.swing.JEditorPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
@@ -47,25 +45,24 @@ public class RegistrationForm extends JFrame {
     JPasswordField confirmPasswordField = new JPasswordField();
     JPasswordField passwordField = new JPasswordField();
 
-    JLabel userNameLabel = new JLabel("User Name");
-    JLabel yearOfBirthLabel = new JLabel("Year of Birth");
-    JLabel firstNameLabel = new JLabel("First Name");
-    JLabel lastNameLabel = new JLabel("Last Name");
-    JLabel addressLabel = new JLabel("Address");
-    JLabel EmailAddressLabel = new JLabel("Email Address");
-    JLabel phoneNumberLabel = new JLabel("Phone Number");
-    JLabel passwordLabel = new JLabel("Password");
-    JLabel confirmPasswordLabel = new JLabel("Confirm Password");
+    private static JLabel userNameLabel = new JLabel("User Name");
+    private static JLabel yearOfBirthLabel = new JLabel("Year of Birth");
+    private static JLabel firstNameLabel = new JLabel("First Name");
+    private static JLabel lastNameLabel = new JLabel("Last Name");
+    private static JLabel addressLabel = new JLabel("Address");
+    private static JLabel EmailAddressLabel = new JLabel("Email Address");
+    private static JLabel phoneNumberLabel = new JLabel("Phone Number");
+    private static JLabel passwordLabel = new JLabel("Password");
+    private static JLabel confirmPasswordLabel = new JLabel("Confirm Password");
+    private static JLabel registrationFormTitleLabel = new JLabel("UNimail SIGN UP FORM");
 
     JButton signInButton = new JButton("BACK TO \tSIGN IN");
     JButton submitButton = new JButton("SUBMIT");
 
-    JEditorPane errorPane = new JEditorPane();
+    JPanel errorPane = new JPanel();
 
-    private static Stack emailsInThe_db;
     private static Stack selectableYears;
     private static Stack placeNamesIn_DB;
-    private static Stack phoneNumbersInThe_db;
 
     public RegistrationForm() {
 
@@ -79,19 +76,19 @@ public class RegistrationForm extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         //String[] phoneNumbers = {"07347864", "573356", "347634546"};
-        phoneNumbersInThe_db = new Stack();
-        emailsInThe_db = new Stack();
         placeNamesIn_DB = new Stack();
         selectableYears = new Stack();
         submitButton.setSize(30, 30);
+        
+        errorPane.setLayout(null);
         errorPane.setBackground(Color.BLUE);
-        errorPane.setForeground(Color.WHITE);
-        errorPane.setFont(new Font("Times New Roman", Font.BOLD, 12));
-        errorPane.setText("DESKTOP GMAIL USER REGISTRATION FORM");
+        registrationFormTitleLabel.setBounds((errorPane.getLocation().x) + 30,(errorPane.getLocation().y) -10 ,540,50);
+        registrationFormTitleLabel.setForeground(Color.WHITE);
+        registrationFormTitleLabel.setFont(new Font("Times New Roman", Font.BOLD, 14));
+        errorPane.add(registrationFormTitleLabel);
         submitButton.setBackground(Color.blue);
         submitButton.setForeground(Color.WHITE);
 
-        // pack();
         //Connect to the database and obtain  years
         try {
 
@@ -158,7 +155,7 @@ public class RegistrationForm extends JFrame {
         yearsField.setPrototypeDisplayValue("1997");
         yearsField.setEditable(true);
 
-        errorPane.setEditable(false);
+        //errorPane.setEditable(false);
 
         //SET UP FIELDS FOR THE ADDRESSES FIELD
         yearsField.setPrototypeDisplayValue("Kakamega");
