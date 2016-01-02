@@ -1,11 +1,14 @@
 package com;
 //this is the code for the registration form
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.Component;
+import java.awt.Font;
 
 import javax.swing.border.BevelBorder;
 import javax.swing.JComboBox;
@@ -14,10 +17,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JButton;
-import javax.swing.JTextField;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 
 import java.sql.SQLException;
 import java.sql.Connection;
@@ -34,13 +37,12 @@ public class RegistrationForm extends JFrame {
 
     JComboBox<String> yearsField = new JComboBox<>();
     JComboBox<String> addressField;
-    JComboBox<String> phoneNumberFieldBox;
-    JComboBox<String> emailsFieldBox;
 
     JTextField firstNameField = new JTextField(20);
     JTextField lastNameField = new JTextField(20);
-    JTextField EmailAddressField = new JTextField(35);
     JTextField userNameField = new JTextField(20);
+    JTextField phoneNumbersField = new JTextField(20);
+    JTextField emailAddressField = new JTextField(40);
 
     JPasswordField confirmPasswordField = new JPasswordField();
     JPasswordField passwordField = new JPasswordField();
@@ -83,6 +85,8 @@ public class RegistrationForm extends JFrame {
         selectableYears = new Stack();
         submitButton.setSize(30, 30);
         errorPane.setBackground(Color.BLUE);
+        errorPane.setForeground(Color.WHITE);
+        errorPane.setFont(new Font("Times New Roman", Font.BOLD, 12));
         errorPane.setText("DESKTOP GMAIL USER REGISTRATION FORM");
         submitButton.setBackground(Color.blue);
         submitButton.setForeground(Color.WHITE);
@@ -118,39 +122,7 @@ public class RegistrationForm extends JFrame {
         //ADD  YEAR VALUES TO YEARS TEXT FIELD 
         yearsField = new JComboBox<>(selectableYears);
 
-        //Connect to registration form database table and obtain current available phone numbers
-        try {
-
-            String SELECT_QUERY = "SELECT phone_name,emailAddress FROM registration_form ";
-            String dbConnectionurl = "jdbc:mysql://localhost:3306/gmail";
-            Connection connection = DriverManager.getConnection(dbConnectionurl, "root", "");
-            Statement sqlStatement = connection.createStatement();
-            ResultSet resultSet = sqlStatement.executeQuery(SELECT_QUERY);
-
-            while (resultSet.next()) {
-
-                phoneNumbersInThe_db.push(resultSet.getString("phone_name"));
-                emailsInThe_db.push(resultSet.getString("emailAddress"));
-            }
-
-        } catch (SQLException e) {
-
-            Toolkit.getDefaultToolkit().beep();
-            JOptionPane.showMessageDialog(panel, e.getMessage());
-        } catch (SecurityException e) {
-
-            Toolkit.getDefaultToolkit().beep();
-            JOptionPane.showMessageDialog(null, "A security breach was detected in your System\n An automatic shut down is scheduled", "SECURITY BREACH WARNING"+e.getMessage(), JOptionPane.WARNING_MESSAGE);
-
-        } catch (StringIndexOutOfBoundsException e) {
-            
-            JOptionPane.showMessageDialog(null,""+e.getMessage());
-        }
-
         //CONNECT TO DB AND OBTAIN NAMES OF PLACES
-        phoneNumberFieldBox = new JComboBox(phoneNumbersInThe_db);
-        emailsFieldBox = new JComboBox<>(emailsInThe_db);
-
         try {
 
             String SELECT_QUERY = "SELECT place FROM places ORDER BY place";
@@ -173,10 +145,10 @@ public class RegistrationForm extends JFrame {
         } catch (SecurityException e) {
 
             Toolkit.getDefaultToolkit().beep();
-            JOptionPane.showMessageDialog(null, "A security breach was detected in your System\n An automatic shut down is scheduled", "SECURITY BREACH WARNING"+e.getMessage(), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "A security breach was detected in your System\n An automatic shut down is scheduled", "SECURITY BREACH WARNING" + e.getMessage(), JOptionPane.WARNING_MESSAGE);
 
         } catch (StringIndexOutOfBoundsException e) {
-            JOptionPane.showMessageDialog(null,""+e.getMessage());
+            JOptionPane.showMessageDialog(null, "" + e.getMessage());
         }
 
         //ADD  PLACE NAMES  TO ADDRESS  TEXT FIELD 
@@ -193,8 +165,8 @@ public class RegistrationForm extends JFrame {
         addressField.setEditable(true);
 
         //SET UP PHONE NUMBER FIELD BOX
-        phoneNumberFieldBox.setEditable(true);
-        emailsFieldBox.setEditable(true);
+        phoneNumbersField.setEditable(true);
+        emailAddressField.setEditable(true);
         panel.setBackground(Color.WHITE);
         panel.setLayout(new GridLayout(20, 1, 2, 2));
         panel2.setBackground(Color.WHITE);
@@ -209,11 +181,11 @@ public class RegistrationForm extends JFrame {
         panel.add(yearOfBirthLabel);
         panel.add(yearsField);
         panel.add(phoneNumberLabel);
-        panel.add(phoneNumberFieldBox);
+        panel.add(phoneNumbersField);
         panel.add(userNameLabel);
         panel.add(userNameField);
         panel.add(EmailAddressLabel);
-        panel.add(emailsFieldBox);
+        panel.add(emailAddressField);
         panel.add(passwordLabel);
         panel.add(passwordField);
         panel.add(confirmPasswordLabel);
@@ -327,24 +299,24 @@ public class RegistrationForm extends JFrame {
         }
         );
 
-        phoneNumberFieldBox.addFocusListener(
+        phoneNumbersField.addFocusListener(
                 new FocusListener() {
 
             @Override
             public void focusGained(FocusEvent event) {
 
-                phoneNumberFieldBox.setBorder(new BevelBorder(BevelBorder.RAISED, Color.BLUE, Color.BLUE));
+                phoneNumbersField.setBorder(new BevelBorder(BevelBorder.RAISED, Color.BLUE, Color.BLUE));
             }
 
             @Override
             public void focusLost(FocusEvent event) {
 
-                if (phoneNumberFieldBox.getSelectedItem().equals("")) {
+                if (phoneNumbersField.getText().equals("")) {
 
-                    phoneNumberFieldBox.setBorder(new BevelBorder(BevelBorder.RAISED, Color.RED, Color.RED));
+                    phoneNumbersField.setBorder(new BevelBorder(BevelBorder.RAISED, Color.RED, Color.RED));
                 } else {
 
-                    phoneNumberFieldBox.setBorder(new BevelBorder(BevelBorder.RAISED, Color.lightGray, Color.lightGray));
+                    phoneNumbersField.setBorder(new BevelBorder(BevelBorder.RAISED, Color.lightGray, Color.lightGray));
                 }
 
             }
@@ -425,11 +397,35 @@ public class RegistrationForm extends JFrame {
             }
         }
         );
+
+        emailAddressField.addFocusListener(
+                new FocusListener() {
+
+            @Override
+            public void focusGained(FocusEvent event) {
+
+                emailAddressField.setBorder(new BevelBorder(BevelBorder.RAISED, Color.BLUE, Color.BLUE));
+            }
+
+            @Override
+            public void focusLost(FocusEvent event) {
+
+                if (emailAddressField.getText().equals("")) {
+
+                    Toolkit.getDefaultToolkit().beep();
+                    emailAddressField.setBorder(new BevelBorder(BevelBorder.RAISED, Color.RED, Color.RED));
+                } else {
+
+                    emailAddressField.setBorder(new BevelBorder(BevelBorder.RAISED, Color.lightGray, Color.lightGray));
+                }
+
+            }
+        }
+        );
     }
 
-    public synchronized  Boolean comparePasswords(String entered_Pass, String confimr_pass) {
+    public synchronized Boolean comparePasswords(String entered_Pass, String confimr_pass) {
 
-        
         if (entered_Pass.equals(confimr_pass)) {
             return true;
         } else {

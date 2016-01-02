@@ -150,7 +150,7 @@ public class InboxFrame2 extends JFrame {
         int screenHeight = screenSize.height;
 
         setSize(800, 660);
-        setVisible(true);
+        //setVisible(true);
         setLocation(getLocation().x, getLocation().y);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         getContentPane().setBackground(Color.BLUE);
@@ -798,7 +798,7 @@ public class InboxFrame2 extends JFrame {
 
             while ((helpContent = b_reader.readLine()) != null) {
 
-                System.out.println(helpContent);
+                System.err.println(helpContent);
             }
 
         } catch (MalformedURLException e) {

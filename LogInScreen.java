@@ -316,8 +316,8 @@ public class LogInScreen extends JFrame implements Runnable {
                         firstName = regForm.firstNameField.getText().toString();
                         lastName = regForm.lastNameField.getText().toString();
                         yearOfBirth = regForm.yearsField.getSelectedItem().toString();
-                        phoneNumber = regForm.phoneNumberFieldBox.getSelectedItem().toString();
-                        emailAddress = regForm.EmailAddressField.getText().toString();
+                        phoneNumber = regForm.phoneNumbersField.getText().toString();
+                        emailAddress = regForm.emailAddressField.getText().toString();
                         password = regForm.passwordField.getText().toString();
                         reEnteredPassword = regForm.confirmPasswordField.getText().toString();
 
