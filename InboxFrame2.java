@@ -25,6 +25,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import java.awt.Desktop;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -38,6 +39,7 @@ import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 
 public class InboxFrame2 extends JFrame {
@@ -126,7 +128,7 @@ public class InboxFrame2 extends JFrame {
     private static JMenu viewMenu;
     private static JMenu logOutMenu;
     private static JList folders;
-    
+
     private static BufferedReader b_reader;
     private static URL helpHTMLPage;
 
@@ -148,7 +150,7 @@ public class InboxFrame2 extends JFrame {
         int screenHeight = screenSize.height;
 
         setSize(800, 660);
-        //setVisible(true);
+        setVisible(true);
         setLocation(getLocation().x, getLocation().y);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         getContentPane().setBackground(Color.BLUE);
@@ -467,112 +469,112 @@ public class InboxFrame2 extends JFrame {
         saveFile.addActionListener(
                 new ActionListener() {
 
-                    @Override
-                    public void actionPerformed(ActionEvent event) {
+            @Override
+            public void actionPerformed(ActionEvent event) {
 
-                        fileChooser.showSaveDialog(getContentPane());
+                fileChooser.showSaveDialog(getContentPane());
 
-                    }
-                }
+            }
+        }
         );
 
         openFile.addActionListener(
                 new ActionListener() {
 
-                    @Override
-                    public void actionPerformed(ActionEvent event) {
+            @Override
+            public void actionPerformed(ActionEvent event) {
 
-                        fileChooser.showOpenDialog(getContentPane());
-                    }
-                }
+                fileChooser.showOpenDialog(getContentPane());
+            }
+        }
         );
 
         newFile.addActionListener(
                 new ActionListener() {
 
-                    @Override
-                    public void actionPerformed(ActionEvent event) {
+            @Override
+            public void actionPerformed(ActionEvent event) {
 
-                        Toolkit.getDefaultToolkit().beep();
-                        JOptionPane.showMessageDialog(null, "New File Created");
-                    }
+                Toolkit.getDefaultToolkit().beep();
+                JOptionPane.showMessageDialog(null, "New File Created");
+            }
 
-                }
+        }
         );
 
         //Set up app exit events
         exitApp.addActionListener(
                 new ActionListener() {
 
-                    @Override
-                    public void actionPerformed(ActionEvent event) {
+            @Override
+            public void actionPerformed(ActionEvent event) {
 
-                        Toolkit.getDefaultToolkit().beep();
-                        int option = JOptionPane.showConfirmDialog(null, "Are you sure you want to exit ?", "", JOptionPane.YES_NO_OPTION);
-                        if (option == JOptionPane.YES_OPTION) {
+                Toolkit.getDefaultToolkit().beep();
+                int option = JOptionPane.showConfirmDialog(null, "Are you sure you want to exit ?", "", JOptionPane.YES_NO_OPTION);
+                if (option == JOptionPane.YES_OPTION) {
 
-                            setVisible(false);
-                            dispose();
-                            System.exit(0);
-
-                        }
-                    }
+                    setVisible(false);
+                    dispose();
+                    System.exit(0);
 
                 }
+            }
+
+        }
         );
 
         logInwithAnotherAcc.addActionListener(
                 new ActionListener() {
 
-                    @Override
-                    public void actionPerformed(ActionEvent event) {
+            @Override
+            public void actionPerformed(ActionEvent event) {
 
-                        Toolkit.getDefaultToolkit().beep();
-                        int option = JOptionPane.showConfirmDialog(rightPanel, "Are you sure you want to Log out?", "UniMessenger", JOptionPane.YES_NO_OPTION);
+                Toolkit.getDefaultToolkit().beep();
+                int option = JOptionPane.showConfirmDialog(rightPanel, "Are you sure you want to Log out?", "UniMessenger", JOptionPane.YES_NO_OPTION);
 
-                        if (option == JOptionPane.YES_OPTION) {
+                if (option == JOptionPane.YES_OPTION) {
 
-                            setVisible(false);
+                    setVisible(false);
 
-                            logInScreen.setVisible(true);
-                        }
-                    }
+                    logInScreen.setVisible(true);
                 }
+            }
+        }
         );
 
         //CREATE ACTION LISTENER FOR THE FOLDERS LIST
         folders.addListSelectionListener(
                 new ListSelectionListener() {
 
-                    @Override
-                    public void valueChanged(ListSelectionEvent event) {
+            @Override
+            public void valueChanged(ListSelectionEvent event) {
 
-                        String selection = folders.getSelectedValue().toString();
+                String selection = folders.getSelectedValue().toString();
 
-                        if (selection.equals("Inbox")) {
+                if (selection.equals("Inbox")) {
 
-                            rightPanel.removeAll();
-                            rightPanel.repaint();
-                            rightPanel.add(new JLabel("There no messages to show currently"));
-                            rightPanel.setBackground(Color.BLUE);
+                    rightPanel.removeAll();
+                    rightPanel.repaint();
+                    rightPanel.add(new JLabel("There no messages to show currently"));
+                    rightPanel.setBackground(Color.BLUE);
 
-                        } else if (selection.equals("Drafts")) {
+                } else if (selection.equals("Drafts")) {
 
-                            //rightPanel.setBackground(Color.red);
-                            splitPane.remove(rightPanel);
-                            splitPane.setRightComponent(panel2);
-                            splitPane.repaint();
+                    //rightPanel.setBackground(Color.red);
+                    splitPane.remove(rightPanel);
+                    splitPane.setRightComponent(panel2);
+                    splitPane.repaint();
 
-                        } else if (selection.equals("Outbox")) {
+                } else if (selection.equals("Outbox")) {
 
-                            rightPanel.setBackground(Color.GREEN);
+                    rightPanel.setBackground(Color.GREEN);
 
-                        } else if (selection.equals("Junk")) {
+                } else if (selection.equals("Junk")) {
 
-                            rightPanel.setBackground(Color.black);
-                        }
-                    }
+                    rightPanel.setBackground(Color.black);
                 }
+            }
+        }
         );
 
         //@BETA :: CODE IS NOT RENDERING
@@ -665,32 +667,32 @@ public class InboxFrame2 extends JFrame {
         object.addMouseListener(
                 new MouseListener() {
 
-                    @Override
-                    public void mouseEntered(MouseEvent event) {
+            @Override
+            public void mouseEntered(MouseEvent event) {
 
-                    }
+            }
 
-                    @Override
-                    public void mouseExited(MouseEvent event) {
+            @Override
+            public void mouseExited(MouseEvent event) {
 
-                    }
+            }
 
-                    @Override
-                    public void mousePressed(MouseEvent event) {
+            @Override
+            public void mousePressed(MouseEvent event) {
 
-                    }
+            }
 
-                    @Override
-                    public void mouseClicked(MouseEvent event) {
+            @Override
+            public void mouseClicked(MouseEvent event) {
 
-                    }
+            }
 
-                    @Override
-                    public void mouseReleased(MouseEvent event) {
-                        //object.setBackground(Color.BLUE);
-                        //DO NOTHING
-                    }
-                }
+            @Override
+            public void mouseReleased(MouseEvent event) {
+                //object.setBackground(Color.BLUE);
+                //DO NOTHING
+            }
+        }
         );
     }
 
@@ -700,37 +702,37 @@ public class InboxFrame2 extends JFrame {
         object.addMouseListener(
                 new MouseListener() {
 
-                    @Override
-                    public void mouseExited(MouseEvent event) {
+            @Override
+            public void mouseExited(MouseEvent event) {
 
-                        object.setFont(new Font("Times New Roman", Font.BOLD, 14));
-                        object.setForeground(Color.WHITE);
-                    }
+                object.setFont(new Font("Times New Roman", Font.BOLD, 14));
+                object.setForeground(Color.WHITE);
+            }
 
-                    @Override
-                    public void mouseEntered(MouseEvent event) {
+            @Override
+            public void mouseEntered(MouseEvent event) {
 
-                        object.setForeground(Color.LIGHT_GRAY);
-                        object.setFont(new Font("Times New Roman", Font.ITALIC, 15));
-                        //menuBar.setBorder(new LineBorder(Color.lightGray, 3));
-                    }
+                object.setForeground(Color.LIGHT_GRAY);
+                object.setFont(new Font("Times New Roman", Font.ITALIC, 15));
+                //menuBar.setBorder(new LineBorder(Color.lightGray, 3));
+            }
 
-                    @Override
-                    public void mousePressed(MouseEvent event) {
+            @Override
+            public void mousePressed(MouseEvent event) {
 
-                        object.setForeground(Color.GREEN);
-                    }
+                object.setForeground(Color.GREEN);
+            }
 
-                    @Override
-                    public void mouseReleased(MouseEvent event) {
+            @Override
+            public void mouseReleased(MouseEvent event) {
 
-                    }
+            }
 
-                    @Override
-                    public void mouseClicked(MouseEvent event) {
-                        object.setForeground(Color.GREEN);
-                    }
-                }
+            @Override
+            public void mouseClicked(MouseEvent event) {
+                object.setForeground(Color.GREEN);
+            }
+        }
         );
     }
 
@@ -740,88 +742,101 @@ public class InboxFrame2 extends JFrame {
         menuBar.addMouseListener(
                 new MouseListener() {
 
-                    @Override
-                    public void mousePressed(MouseEvent event) {
+            @Override
+            public void mousePressed(MouseEvent event) {
 
-                        //DON NOTHING 
-                    }
+                //DON NOTHING 
+            }
 
-                    @Override
-                    public void mouseClicked(MouseEvent event) {
+            @Override
+            public void mouseClicked(MouseEvent event) {
 
-                        //DON NOTHING 
-                    }
+                //DON NOTHING 
+            }
 
-                    @Override
-                    public void mouseReleased(MouseEvent event) {
-                        //DON NOTHING
-                    }
+            @Override
+            public void mouseReleased(MouseEvent event) {
+                //DON NOTHING
+            }
 
-                    @Override
-                    public void mouseExited(MouseEvent event) {
+            @Override
+            public void mouseExited(MouseEvent event) {
 
-                        menuBar.setBorder(new LineBorder(Color.WHITE, 5));
-                    }
+                menuBar.setBorder(new LineBorder(Color.WHITE, 5));
+            }
 
-                    @Override
-                    public void mouseEntered(MouseEvent event) {
+            @Override
+            public void mouseEntered(MouseEvent event) {
 
-                        menuBar.setBorder(new LineBorder(Color.LIGHT_GRAY, 5));
+                //menuBar.setBorder(new LineBorder(Color.LIGHT_GRAY, 5));
+            }
 
-                    }
+        }
+        );
 
-                }
+        helpOption.addActionListener(
+                new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+
+                obtainHelpHTMLPage();
+            }
+        }
         );
         
-        helpOption.addActionListener(
-                
-                new ActionListener(){
-                    
-                    @Override
-                    public void actionPerformed(ActionEvent event){
-                        
-                        obtainHelpHTMLPage();
-                    }
-                }
-        );
+        
     }
 
-    public void obtainHelpHTMLPage(){
-        
-        try{
-            
-             String helpContent;
-             helpHTMLPage = new URL("file:///C:/Users/user/Desktop/JavaTestPage/thePage2.html");
-             b_reader = new BufferedReader( new InputStreamReader(helpHTMLPage.openConnection().getInputStream()));
-             
-             while((helpContent = b_reader.readLine())!= null){
-             
-                 System.out.println(helpContent);
-             }
-             
-             
-            
-        }catch(MalformedURLException e){
-            
+    public void obtainHelpHTMLPage2() {
+
+        try {
+
+            String helpContent;
+            helpHTMLPage = new URL("file:///C:/Users/user/Desktop/NetBeans%20Java%20Projects/GmailDesktopApp/src/com/JavaTestPage/thePage2.html");
+            b_reader = new BufferedReader(new InputStreamReader(helpHTMLPage.openConnection().getInputStream()));
+
+            while ((helpContent = b_reader.readLine()) != null) {
+
+                System.out.println(helpContent);
+            }
+
+        } catch (MalformedURLException e) {
+
             e.printStackTrace();
-            
-        }catch(IOException e){
-            
+
+        } catch (IOException e) {
+
             e.printStackTrace();
         }
     }
-    
+
+    //Open the help content from a pre-defined web page
+    public void obtainHelpHTMLPage() {
+
+        try {
+            
+            String helpPageUrl = "file:///C:/Users/user/Desktop/NetBeans%20Java%20Projects/GmailDesktopApp/src/com/JavaTestPage/thePage2.html";
+            Desktop myDeskop = Desktop.getDesktop();
+            myDeskop.browse(URI.create(helpPageUrl));
+
+        } catch (IOException e) {
+
+            System.err.println("ERROR:" + e.getMessage());
+        }
+    }
+
     public static void main(String[] args) {
 
         javax.swing.SwingUtilities.invokeLater(
                 new Runnable() {
 
-                    @Override
-                    public void run() {
+            @Override
+            public void run() {
 
-                        new InboxFrame2();
-                    }
-                }
+                new InboxFrame2();
+            }
+        }
         );
 
     }
