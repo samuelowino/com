@@ -233,7 +233,7 @@ public class LogInScreen extends JFrame implements Runnable {
         emailsFieldBox = new JComboBox<>(emailsInThe_DB);
         emailsFieldBox.setCursor(new Cursor(Cursor.TEXT_CURSOR));
         //SET FOCUS LISTENER FOR THE emailsField COMBO BOX
-        emailsFieldBox.setForeground(Color.GREEN);
+        emailsFieldBox.setForeground(Color.BLUE);
         emailsFieldBox.addFocusListener(
                 new FocusListener() {
 
