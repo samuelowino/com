@@ -59,18 +59,25 @@ public class InboxFrame2 extends JFrame {
     private static JPanel inboxPanel;
     private static JPanel sentMailPanel;
     private static JPanel newMailPanel;
-    
+    private static JPanel junkPanel;
+    private static JPanel sentPanel;
+
     private static JTextField searchField;
-            
-            
+
     private static JFileChooser fileChooser;
     private static JSplitPane splitPane;
     private static JPanel leftPanel;
     private static JPanel rightPanel;
     private static JButton inboxButton;
 
-    private static JComboBox emailFieldBox;
     private static JLabel inboxLabel;
+    private static JLabel outBoxLabel;
+    private static JLabel newMailLabel;
+    private static JLabel draftsLabel;
+    private static JLabel junkLabel;
+    private static JLabel sentLabel;
+
+    private static JComboBox emailFieldBox;
     private static JMenuBar menuBar;
     private static JMenuItem menuItem;
     private static JMenuItem newFile;
@@ -158,7 +165,7 @@ public class InboxFrame2 extends JFrame {
         int screenHeight = screenSize.height;
 
         setSize(800, 660);
-        setVisible(true);
+        //setVisible(true);
         setLocation(getLocation().x, getLocation().y);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         getContentPane().setBackground(Color.BLUE);
@@ -169,33 +176,70 @@ public class InboxFrame2 extends JFrame {
         sentMailPanel = new JPanel();
         inboxPanel = new JPanel();
         newMailPanel = new JPanel();
-        
+        junkPanel = new JPanel();
+        sentPanel = new JPanel();
+
         draftsPanel.setBackground(Color.BLUE);
         sentMailPanel.setBackground(Color.DARK_GRAY);
         inboxPanel.setBackground(Color.yellow);
         newMailPanel.setBackground(Color.red);
-        inboxPanel.setSize(559,getSize().height);
-        newMailPanel.setSize(559,getSize().height);
-        draftsPanel.setSize(559,getSize().height);
-        sentMailPanel.setSize(559,getSize().height);
-        
+        junkPanel.setBackground(Color.CYAN);
+        sentPanel.setBackground(Color.orange);
+        inboxPanel.setSize(559, getSize().height);
+        newMailPanel.setSize(559, getSize().height);
+        junkPanel.setSize(559, getSize().height);
+        sentPanel.setSize(559, getSize().height);
+        draftsPanel.setSize(559, getSize().height);
+        sentMailPanel.setSize(559, getSize().height);
+
         draftsPanel.setLayout(null);
         sentMailPanel.setLayout(null);
         inboxPanel.setLayout(null);
         newMailPanel.setLayout(null);
-        
-        System.err.println("Drafts Panel SIZE: width"+draftsPanel.getSize().width+"\nHeight: "+draftsPanel.getSize().height+"\nLocation("+draftsPanel.getLocation().x+","+draftsPanel.getLocation().y+")");
-        System.err.println("new Mail Panel SIZE: width"+newMailPanel.getSize().width+"\nHeight: "+newMailPanel.getSize().height+"\nLocation("+draftsPanel.getLocation().x+","+draftsPanel.getLocation().y+")");
-        
-       
+        junkPanel.setLayout(null);
+        sentPanel.setLayout(null);
+
+        System.err.println("Drafts Panel SIZE: width" + draftsPanel.getSize().width + "\nHeight: " + draftsPanel.getSize().height + "\nLocation(" + draftsPanel.getLocation().x + "," + draftsPanel.getLocation().y + ")");
+        System.err.println("new Mail Panel SIZE: width" + newMailPanel.getSize().width + "\nHeight: " + newMailPanel.getSize().height + "\nLocation(" + draftsPanel.getLocation().x + "," + draftsPanel.getLocation().y + ")");
+
         //SET UP DYNAMIC PANEL COMPONENTS
+        //I.SEARCH FIELD
         searchField = new JTextField(100);
         searchField.setText("Search");
-        searchField.setBounds(0,0, 559, 30);
-        
-        inboxLabel = new JLabel("Inbox");
+        searchField.setBounds(0, 0, 559, 30);
 
-        String[] folderContnets = {"Folders\t\t",  "\t\t", "\t\t", "New Mail\t\t","\t\t", "\t\t", "Inbox\t\t", "\t\t", "\t\t", "Outbox\t\t", "\t\t", "\t\t", "Drafts\t\t", "\t\t", "\t\t", "Junk\t\t", "\t\t", "\t\t", "sent\t\t", "  \t\t"};
+        //II.INBOX,DRAFT,JUNK, SENT AND NEWMAIL LABELS
+        inboxLabel = new JLabel("Inbox");
+        inboxLabel.setBounds(0, 30, 559, 30);
+        inboxLabel.setFont(new Font("Times New Roman", Font.BOLD, 16));
+        inboxLabel.setBorder(new LineBorder(Color.lightGray));
+
+        newMailLabel = new JLabel("New Mail");
+        newMailLabel.setBounds(0, 30, 559, 30);
+        newMailLabel.setFont(new Font("Times New Roman", Font.BOLD, 16));
+        newMailLabel.setBorder(new LineBorder(Color.lightGray));
+
+        draftsLabel = new JLabel("Drafts");
+        draftsLabel.setBounds(0, 30, 559, 30);
+        draftsLabel.setFont(new Font("Times New Roman", Font.BOLD, 16));
+        draftsLabel.setBorder(new LineBorder(Color.lightGray));
+
+        outBoxLabel = new JLabel("OutBox");
+        outBoxLabel.setBounds(0, 30, 559, 30);
+        outBoxLabel.setFont(new Font("Times New Roman", Font.BOLD, 16));
+        outBoxLabel.setBorder(new LineBorder(Color.lightGray));
+        
+        junkLabel = new JLabel("Junk");
+        junkLabel.setBounds(0, 30, 559, 30);
+        junkLabel.setFont(new Font("Times New Roman", Font.BOLD, 16));
+        junkLabel.setBorder(new LineBorder(Color.lightGray));
+
+        sentLabel = new JLabel("Sent Mails");
+        sentLabel.setBounds(0, 30, 559, 30);
+        sentLabel.setFont(new Font("Times New Roman", Font.BOLD, 16));
+        sentLabel.setBorder(new LineBorder(Color.lightGray));
+        
+        String[] folderContnets = {"Folders\t\t", "\t\t", "\t\t", "New Mail\t\t", "\t\t", "\t\t", "Inbox\t\t", "\t\t", "\t\t", "Outbox\t\t", "\t\t", "\t\t", "Drafts\t\t", "\t\t", "\t\t", "junk\t\t", "\t\t", "\t\t", "sent\t\t", "  \t\t"};
         folders = new JList(folderContnets);
         folders.setBackground(Color.BLUE);
         folders.setForeground(Color.WHITE);
@@ -576,8 +620,6 @@ public class InboxFrame2 extends JFrame {
             }
         }
         );
-        
-        
 
         //CREATE ACTION LISTENER FOR THE FOLDERS LIST
         folders.addListSelectionListener(new ListSelectionListener() {
@@ -591,123 +633,179 @@ public class InboxFrame2 extends JFrame {
 
                     splitPane.remove(rightPanel);
                     inboxPanel.add(searchField);
+                    inboxPanel.add(inboxLabel);
+                    inboxLabel.setBackground(Color.WHITE);
                     splitPane.setRightComponent(inboxPanel);
                     splitPane.repaint();
-                    
-                    searchField.addFocusListener(
-                
-                new FocusListener(){
-                    
-                    @Override
-                    public void focusGained(FocusEvent event){
-                        
-                        searchField.setText("");
-                        searchField.setEnabled(true);
-                        searchField.setEditable(true);
-                    }
-                    
-                    @Override
-                    public void focusLost(FocusEvent event){
-                        
-                        searchField.setText("Search");
-                        searchField.setEditable(false);
-                        //searchField.setEnabled(false);
-                    }
-                }
-        );
 
+                    searchField.addFocusListener(
+                            new FocusListener() {
+
+                        @Override
+                        public void focusGained(FocusEvent event) {
+
+                            searchField.setText("");
+                            searchField.setEnabled(true);
+                            searchField.setEditable(true);
+                        }
+
+                        @Override
+                        public void focusLost(FocusEvent event) {
+
+                            searchField.setText("Search");
+                            searchField.setEditable(false);
+                        }
+                    }
+                    );
 
                 } else if (selection.equals("Drafts\t\t")) {
 
                     //rightPanel.setBackground(Color.red);
                     splitPane.remove(rightPanel);
                     draftsPanel.add(searchField);
+                    draftsPanel.add(draftsLabel);
+                    inboxLabel.setBackground(Color.WHITE);
                     splitPane.setRightComponent(draftsPanel);
                     splitPane.repaint();
-                    
+
                     //SET FOCUS LISTENER FOR THE SEARCH FIELD
-        searchField.addFocusListener(
-                
-                new FocusListener(){
-                    
-                    @Override
-                    public void focusGained(FocusEvent event){
-                        
-                        searchField.setText("");
-                        searchField.setEnabled(true);
-                        searchField.setEditable(true);
+                    searchField.addFocusListener(
+                            new FocusListener() {
+
+                        @Override
+                        public void focusGained(FocusEvent event) {
+
+                            searchField.setText("");
+                            searchField.setEnabled(true);
+                            searchField.setEditable(true);
+                        }
+
+                        @Override
+                        public void focusLost(FocusEvent event) {
+
+                            searchField.setText("Search");
+                            searchField.setEditable(false);
+                        }
                     }
-                    
-                    @Override
-                    public void focusLost(FocusEvent event){
-                        
-                        searchField.setText("Search");
-                        searchField.setEditable(false);
-                        //searchField.setEnabled(false);
-                    }
-                }
-        );
+                    );
 
                 } else if (selection.equals("Outbox\t\t")) {
-                    
+
                     splitPane.remove(rightPanel);
                     sentMailPanel.add(searchField);
+                    sentMailPanel.add(outBoxLabel);
+                    inboxLabel.setBackground(Color.WHITE);
                     splitPane.setRightComponent(sentMailPanel);
                     splitPane.repaint();
-                    
+
                     //SET FOCUS LISTENER FOR THE SEARCH FIELD
-        searchField.addFocusListener(
-                
-                new FocusListener(){
-                    
-                    @Override
-                    public void focusGained(FocusEvent event){
-                        
-                        searchField.setText("");
-                        searchField.setEnabled(true);
-                        searchField.setEditable(true);
+                    searchField.addFocusListener(
+                            new FocusListener() {
+
+                        @Override
+                        public void focusGained(FocusEvent event) {
+
+                            searchField.setText("");
+                            searchField.setEnabled(true);
+                            searchField.setEditable(true);
+                        }
+
+                        @Override
+                        public void focusLost(FocusEvent event) {
+
+                            searchField.setText("Search");
+                            searchField.setEditable(false);
+                        }
                     }
-                    
-                    @Override
-                    public void focusLost(FocusEvent event){
-                        
-                        searchField.setText("Search");
-                        searchField.setEditable(false);
-                        //searchField.setEnabled(false);
-                    }
-                }
-        );
-                    
+                    );
 
                 } else if (selection.equals("New Mail\t\t")) {
-                    
+
                     splitPane.remove(rightPanel);
                     newMailPanel.add(searchField);
+                    newMailPanel.add(newMailLabel);
+                    inboxLabel.setBackground(Color.WHITE);
                     splitPane.setRightComponent(newMailPanel);
                     splitPane.repaint();
-                    
+
                     //SET FOCUS LISTENER FOR THE SEARCH FIELD
-        searchField.addFocusListener(
-                
-                new FocusListener(){
-                    
-                    @Override
-                    public void focusGained(FocusEvent event){
-                        
-                        searchField.setText("");
-                        searchField.setEnabled(true);
-                        searchField.setEditable(true);
+                    searchField.addFocusListener(
+                            new FocusListener() {
+
+                        @Override
+                        public void focusGained(FocusEvent event) {
+
+                            searchField.setText("");
+                            searchField.setEnabled(true);
+                            searchField.setEditable(true);
+                        }
+
+                        @Override
+                        public void focusLost(FocusEvent event) {
+
+                            searchField.setText("Search");
+                            searchField.setEditable(false);
+                        }
                     }
-                    
-                    @Override
-                    public void focusLost(FocusEvent event){
-                        
-                        searchField.setText("Search");
-                        searchField.setEditable(false);
-                        //searchField.setEnabled(false);
+                    );
+                } else if (selection.equals("junk\t\t")) {
+
+                    splitPane.remove(rightPanel);
+                    junkPanel.add(searchField);
+                    junkPanel.add(junkLabel);
+                    inboxLabel.setBackground(Color.WHITE);
+                    splitPane.setRightComponent(junkPanel);
+                    splitPane.repaint();
+
+                    //SET FOCUS LISTENER FOR THE SEARCH FIELD
+                    searchField.addFocusListener(
+                            new FocusListener() {
+
+                        @Override
+                        public void focusGained(FocusEvent event) {
+
+                            searchField.setText("");
+                            searchField.setEnabled(true);
+                            searchField.setEditable(true);
+                        }
+
+                        @Override
+                        public void focusLost(FocusEvent event) {
+
+                            searchField.setText("Search");
+                            searchField.setEditable(false);
+                        }
                     }
-                }
-        );
+                    );
+                } else if (selection.equals("sent\t\t")) {
+
+                    splitPane.remove(rightPanel);
+                    sentPanel.add(searchField);
+                    sentPanel.add(sentLabel);
+                    inboxLabel.setBackground(Color.WHITE);
+                    splitPane.setRightComponent(sentPanel);
+                    splitPane.repaint();
+
+                    //SET FOCUS LISTENER FOR THE SEARCH FIELD
+                    searchField.addFocusListener(
+                            new FocusListener() {
+
+                        @Override
+                        public void focusGained(FocusEvent event) {
+
+                            searchField.setText("");
+                            searchField.setEnabled(true);
+                            searchField.setEditable(true);
+                        }
+
+                        @Override
+                        public void focusLost(FocusEvent event) {
+
+                            searchField.setText("Search");
+                            searchField.setEditable(false);
+                        }
+                    }
+                    );
                 }
             }
         }
@@ -745,53 +843,7 @@ public class InboxFrame2 extends JFrame {
         getMenusMouseEvents(viewMenu);
 
         getMenuBarMouseEvent();
-        /**
-         *
-         */
-        /**
-         * //INBOX PANEL CODE GOES HERE allComboBox = new
-         * JComboBox(typesOfMesssages); lineInboxLabelBorder = new
-         * LineBorder(Color.BLACK,1); inboxPanelLable = new JLabel("Inbox");
-         * panelSearchField = new JTextField("Search"); searchButton = new
-         * JButton(); searchButton.setBackground(Color.BLUE);
-         * allComboBox.setBounds(451,30,100,30);
-         * searchButton.setBounds(451,0,100,30); searchImage = new
-         * ImageIcon(getClass().getResource("search.png"));
-         * searchButton.setIcon(searchImage);
-         *
-         * onInboxPanel = new JPanel(); onInboxPanel.setBackground(Color.WHITE);
-         * onInboxPanel.setBounds(0, 0, 600, 500); onInboxPanel.setLayout(null);
-         *
-         * inboxPanelLable.setBounds(0,31,450,30);
-         * inboxPanelLable.setBorder(lineInboxLabelBorder);
-         * panelSearchField.setBounds(0, 0, 450, 30);
-         * panelSearchField.setEditable(false);
-         *
-         * onInboxPanel.add(searchField); onInboxPanel.add(searchButton);
-         * onInboxPanel.add(inboxPanelLable); onInboxPanel.add(allComboBox);
-         *
-         *
-         * searchField.addMouseListener( new MouseListener() {
-         *
-         * @Override public void mouseEntered(MouseEvent event) {
-         *
-         * }
-         *
-         * @Override public void mouseExited(MouseEvent event) {
-         *
-         * searchField.setEnabled(false); searchField.setEditable(false);
-         * //searchField.setText("Search"); }
-         *
-         * @Override public void mousePressed(MouseEvent event) { //do nothing }
-         *
-         * @Override public void mouseReleased(MouseEvent event) { //do nothing
-         * }
-         *
-         * @Override public void mouseClicked(MouseEvent event) {
-         *
-         * searchField.setText(""); searchField.setEnabled(true);
-         * searchField.setEditable(true); } } );*
-         */
+
         //ADD SPLIT PANE AND MENU BAR TO THE 
         add(splitPane);
         setJMenuBar(menuBar);
@@ -920,8 +972,7 @@ public class InboxFrame2 extends JFrame {
             }
         }
         );
-        
-        
+
     }
 
     public void obtainHelpHTMLPage2() {
@@ -951,7 +1002,7 @@ public class InboxFrame2 extends JFrame {
     public void obtainHelpHTMLPage() {
 
         try {
-            
+
             String helpPageUrl = "file:///C:/Users/user/Desktop/NetBeans%20Java%20Projects/GmailDesktopApp/src/com/JavaTestPage/thePage2.html";
             Desktop myDeskop = Desktop.getDesktop();
             myDeskop.browse(URI.create(helpPageUrl));
