@@ -87,17 +87,7 @@ public class LogInScreen extends JFrame implements Runnable, AutoCloseable {
 
         super("UniMessenger");
 
-        //repaint();
-        //iconsPanel.setToolTipText("Gmail accout log in screen... \nenter Credentials \nand log in to your account");
         errorWindow.setEnabled(false);
-
-        //GET TOOLKIT USE IT TO SET UP IMAGES
-        Toolkit kit = Toolkit.getDefaultToolkit();
-        Dimension screenSize = kit.getScreenSize();
-        int height = screenSize.height;
-        int width = screenSize.width;
-        Image IconImg = kit.getImage("anonimas.jpg");
-        Image labelImage = kit.getImage("imge.png");
 
         //SET FRAME PROPERTIES
         setSize(600, 700);
@@ -108,13 +98,13 @@ public class LogInScreen extends JFrame implements Runnable, AutoCloseable {
         setIconImage(new ImageIcon("anonimas.jpg").getImage());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(false);
-        setIconImage(IconImg);
 
         //surgeted progress bar window
         progressBarWindow = new JFrame("UniMessegner");
         progressBarWindow.setSize(200, 100);
         progressBarWindow.setVisible(false);
         progressBarWindow.setUndecorated(true);
+        
         setLocation(30, 30);
         setResizable(false);
 
@@ -139,7 +129,6 @@ public class LogInScreen extends JFrame implements Runnable, AutoCloseable {
         signUpButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         bottomPanel.add(signInButton, BorderLayout.EAST);
-        //bottomPanel.setBackground(Color.white);
         bottomPanel.add(signUpButton);
 
         //set icons panel attributes
@@ -222,13 +211,13 @@ public class LogInScreen extends JFrame implements Runnable, AutoCloseable {
                 emailsInThe_DB.push(resultSet.getString("emailAddress"));
             }
 
-            //connection.close();
+            connection.close();
 
         } catch (SQLException e) {
 
             Toolkit.getDefaultToolkit().beep();
-           // JOptionPane.showMessageDialog(iconsPanel, e.getMessage());
-           System.err.println("Line 231"+e.getMessage());
+            JOptionPane.showMessageDialog(iconsPanel, e.getMessage());
+            System.err.println("Line 231"+e.getMessage());
 
         } catch (SecurityException e) {
 
@@ -236,12 +225,14 @@ public class LogInScreen extends JFrame implements Runnable, AutoCloseable {
             JOptionPane.showMessageDialog(null, "A security breach was detected in your System\n An automatic shut down is scheduled", "SECURITY BREACH WARNING" + e.getMessage(), JOptionPane.WARNING_MESSAGE);
 
         } catch (StringIndexOutOfBoundsException e) {
+            
             JOptionPane.showMessageDialog(null, "" + e.getMessage(), "UniMessenger", JOptionPane.PLAIN_MESSAGE);
         }
 
         //ADD  PHONE NUMBER VALUES TO PHONE NUMBER TEXT FIELD 
         emailsFieldBox = new JComboBox<>(emailsInThe_DB);
         emailsFieldBox.setCursor(new Cursor(Cursor.TEXT_CURSOR));
+        
         //SET FOCUS LISTENER FOR THE emailsField COMBO BOX
         emailsFieldBox.setForeground(Color.BLUE);
         emailsFieldBox.addFocusListener(
@@ -396,7 +387,7 @@ public class LogInScreen extends JFrame implements Runnable, AutoCloseable {
                 } catch (SQLException ex) {
 
                     Toolkit.getDefaultToolkit().beep();
-                    //JOptionPane.showMessageDialog(null, "Well thie is embarrasing but we couldn't connect to the server Details:\n" + ex.getMessage());
+                    JOptionPane.showMessageDialog(null, "Well thie is embarrasing but we couldn't connect to the server Details:\n" + ex.getMessage());
                     System.err.println("Line 400"+ex.getMessage());
                 }
 
@@ -604,12 +595,12 @@ public class LogInScreen extends JFrame implements Runnable, AutoCloseable {
                         setApplicationContextData(enteredEmailAddress, userName);
                         setInstanceUser(enteredEmailAddress, userName);
 
-                        //connection.close();
+                        connection.close();
                     }
 
                 } catch (SQLException e) {
 
-                    //JOptionPane.showMessageDialog(null, "" + e.getMessage());
+                    JOptionPane.showMessageDialog(null, "" + e.getMessage());
                     System.err.println("Line 613"+e.getMessage());
                 }
             }
@@ -629,7 +620,6 @@ public class LogInScreen extends JFrame implements Runnable, AutoCloseable {
 
                 errorWindow.setFont(new Font("Times New Roman", Font.BOLD, 14));
                 errorWindow.setBackground(Color.white);
-
                 errorWindow.setText(errorMessage);
 
             }
@@ -684,7 +674,7 @@ public class LogInScreen extends JFrame implements Runnable, AutoCloseable {
 
             System.out.println("Table was created successfuly");
 
-            //sqlConnection.close();
+            sqlConnection.close();
 
         } catch (SQLException e) {
 
@@ -703,7 +693,7 @@ public class LogInScreen extends JFrame implements Runnable, AutoCloseable {
             newSqlStatements.executeUpdate(SQL_INSERT_QUERY);
 
             System.err.println("Application user data was succefully updated...");
-            //newDBConnection.close();
+            newDBConnection.close();
 
         } catch (SQLException e) {
 

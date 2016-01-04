@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
 
 import java.sql.SQLException;
 import java.sql.ResultSet;
@@ -54,6 +55,7 @@ public class InboxFrame2 extends JFrame implements AutoCloseable {
     private static String[] typesOfMesssages = {"All", "Flagged", "Unread"};
     private static String dbConnectioURL = "jdbc:mysql://localhost:3306/gmail";
     private static List<String> contactsInformation = new ArrayList<>();
+    private static HashMap<String,String> currentUserData = new HashMap<>();
     private static String currentUser;
     private static String currentUsersEmail;
     private static JTextField panelSearchField;
@@ -586,7 +588,7 @@ public class InboxFrame2 extends JFrame implements AutoCloseable {
                 int option = JOptionPane.showConfirmDialog(null, "Are you sure you want to exit ?", "", JOptionPane.YES_NO_OPTION);
                 if (option == JOptionPane.YES_OPTION) {
 
-                    deleteInstanceUserData(getCurrentUser());
+                    deleteInstanceUserData(getCurrentUser().get("usersEmail"));
                     setVisible(false);
                     dispose();
                     System.exit(0);
@@ -848,7 +850,19 @@ public class InboxFrame2 extends JFrame implements AutoCloseable {
             @Override
             public void actionPerformed(ActionEvent event) {
 
-                getContacts(getCurrentUser());
+                getContacts(getCurrentUser().get("usersName"));
+            }
+        }
+        );
+
+        //ADD ACTION LISTENER TO THE ADD NEW CONTACTS MENU ITEM
+        addNewContacts.addActionListener(
+                new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+
+                addContacts(getCurrentUser().get("usersName"));
             }
         }
         );
@@ -983,6 +997,22 @@ public class InboxFrame2 extends JFrame implements AutoCloseable {
 
     }
 
+    //ADD NEW CONTACTS
+    public void addContacts(String currentUsersName) {
+
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/gmail", "root", "");
+                Statement mysqlStatements = connection.createStatement()) {
+            String INSERT_QUERY = "INSERT INTO contactsfor_" + currentUsersName + "VALUES('name','phone','email','address','Groups');";
+            mysqlStatements.executeUpdate(INSERT_QUERY);
+            
+            System.err.println("Contacts added succefully..");
+            
+        } catch (SQLException e) {
+            
+            JOptionPane.showMessageDialog(null,"UNimessenger","404 ERROR"+e.getMessage(),JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
     public void obtainHelpHTMLPage2() {
 
         try {
@@ -1020,7 +1050,7 @@ public class InboxFrame2 extends JFrame implements AutoCloseable {
     }
 
     //GET CURRENT LOGGED IN USER
-    public String getCurrentUser() {
+    public HashMap<String,String> getCurrentUser() {
 
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/gmail", "root", "");
                 Statement sqlStatmt = connection.createStatement()) {
@@ -1030,22 +1060,22 @@ public class InboxFrame2 extends JFrame implements AutoCloseable {
 
             while (queryResults.next()) {
 
-                 currentUser = queryResults.getString("currentLoggedInUser");
-                 currentUsersEmail = queryResults.getString("userEmail");
-
+                currentUser = queryResults.getString("currentLoggedInUser");
+                currentUsersEmail = queryResults.getString("userEmail");
+                currentUserData.put("usersName",currentUser);
+                currentUserData.put("usersEmail",currentUsersEmail);
             }
-
             System.err.println("CURRENT USER'S DATA:\nUser Name :" + currentUser + "\nUser Email" + currentUsersEmail);
-
+            
             connection.close();
 
         } catch (SQLException e) {
 
-            //JOptionPane.showMessageDialog(null, "404 ERROR" + e.getMessage(), "UniMessenger", JOptionPane.WARNING_MESSAGE);
-            System.out.println("Line 1047 inbox"+e.getMessage());
+            JOptionPane.showMessageDialog(null, "404 ERROR" + e.getMessage(), "UniMessenger", JOptionPane.WARNING_MESSAGE);
+            System.out.println("Line 1047 inbox" + e.getMessage());
         }
-        
-        return currentUsersEmail;
+
+        return currentUserData;
     }
 
     //CLEAR INSTANCE USER DATA
@@ -1063,12 +1093,12 @@ public class InboxFrame2 extends JFrame implements AutoCloseable {
         } catch (SQLException e) {
 
             JOptionPane.showMessageDialog(null, "404 ERROR" + e.getMessage(), "UniMessenger", JOptionPane.WARNING_MESSAGE);
-            System.out.println("Line 1067"+e.getMessage());
+            System.out.println("Line 1067" + e.getMessage());
         }
     }
 
     //RETRIVE ALL CONTACTS RELATED TO CURRENT USER FROM DB USING APPLICATION CONTEXT
-    public void getContacts( String currentUsersEmail) {
+    public void getContacts(String currentUser) {
 
         //Retrieve application context data
         try (Connection sqlConnection = DriverManager.getConnection("jdbc:mysql://localhost:3306/gmail", "root", "");
@@ -1095,8 +1125,8 @@ public class InboxFrame2 extends JFrame implements AutoCloseable {
             }
         } catch (SQLException e) {
 
-            //JOptionPane.showMessageDialog(menuBar, "404 ERROR : CURRENT USER NOT RECOGNISED !!", "UniMesseger\n\t" + e.getMessage(), JOptionPane.WARNING_MESSAGE);
-            System.err.println("Line 1100"+e.getMessage());
+            JOptionPane.showMessageDialog(menuBar, "404 ERROR : CURRENT USER NOT RECOGNISED !!", "UniMesseger\n\t" + e.getMessage(), JOptionPane.WARNING_MESSAGE);
+            System.err.println("Line 1100" + e.getMessage());
         }
 
     }
