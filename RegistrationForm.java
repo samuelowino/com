@@ -28,7 +28,7 @@ import java.sql.Statement;
 
 import java.util.Stack;
 
-public class RegistrationForm extends JFrame {
+public class RegistrationForm extends JFrame implements AutoCloseable {
 
     JPanel panel = new JPanel();
     JPanel panel2 = new JPanel();
@@ -93,8 +93,7 @@ public class RegistrationForm extends JFrame {
         try {
 
             String SELECT_QUERY = "SELECT year FROM years ORDER BY year ";
-            String dbConnectionurl = "jdbc:mysql://localhost:3306/gmail";
-            Connection connection = DriverManager.getConnection(dbConnectionurl, "root", "");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/gmail", "root", "");
             Statement sqlStatement = connection.createStatement();
             ResultSet resultSet = sqlStatement.executeQuery(SELECT_QUERY);
 
@@ -103,12 +102,14 @@ public class RegistrationForm extends JFrame {
                 selectableYears.push(resultSet.getString("year"));
 
             }
+            connection.close();
 
         } catch (SQLException e) {
 
             Toolkit.getDefaultToolkit().beep();
-            JOptionPane.showMessageDialog(panel, e.getMessage());
-
+            //JOptionPane.showMessageDialog(panel, e.getMessage());
+            System.err.println("Line 111"+e.getMessage());
+            
         } catch (SecurityException e) {
 
             Toolkit.getDefaultToolkit().beep();
@@ -120,12 +121,10 @@ public class RegistrationForm extends JFrame {
         yearsField = new JComboBox<>(selectableYears);
 
         //CONNECT TO DB AND OBTAIN NAMES OF PLACES
-        try {
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/gmail", "root", "");
+            Statement sqlStatement = connection.createStatement();) {
 
             String SELECT_QUERY = "SELECT place FROM places ORDER BY place";
-            String dbConnectionurl = "jdbc:mysql://localhost:3306/gmail";
-            Connection connection = DriverManager.getConnection(dbConnectionurl, "root", "");
-            Statement sqlStatement = connection.createStatement();
             ResultSet resultSet = sqlStatement.executeQuery(SELECT_QUERY);
 
             while (resultSet.next()) {
@@ -133,12 +132,15 @@ public class RegistrationForm extends JFrame {
                 placeNamesIn_DB.push(resultSet.getString("place"));
 
             }
-
+            
+            connection.close();
+            
         } catch (SQLException e) {
 
             Toolkit.getDefaultToolkit().beep();
-            JOptionPane.showMessageDialog(panel, e.getMessage());
-
+            //JOptionPane.showMessageDialog(panel, e.getMessage());
+            System.err.println("Line 142"+e.getMessage());
+            
         } catch (SecurityException e) {
 
             Toolkit.getDefaultToolkit().beep();
@@ -419,6 +421,12 @@ public class RegistrationForm extends JFrame {
             }
         }
         );
+    }
+    
+    @Override
+    public void close(){
+        
+        System.err.println("All reasorces are now closed...");
     }
 
     public synchronized Boolean comparePasswords(String entered_Pass, String confimr_pass) {

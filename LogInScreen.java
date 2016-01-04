@@ -22,6 +22,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import java.util.Calendar;
+
 import java.beans.PropertyChangeListener;
 
 import java.sql.ResultSet;
@@ -29,6 +31,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
+import java.util.TimeZone;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -42,10 +46,13 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 
-public class LogInScreen extends JFrame implements Runnable {
+//@SuppressWarnings(unchecked);
+public class LogInScreen extends JFrame implements Runnable, AutoCloseable {
 
+    public String currentUser;
     private static JFrame progressBarWindow;
     private static final String url = "jdbc:mysql://localhost:3306/gmail";
+    private static Date currentTime = new Date();
     private static final InboxFrame2 inboxFrame = new InboxFrame2();
     public Stack emailsInThe_DB;
     public JComboBox<String> emailsFieldBox;
@@ -55,7 +62,7 @@ public class LogInScreen extends JFrame implements Runnable {
     private JPanel credentialsPanel = new JPanel();
     private static final JLabel emailsLabel = new JLabel("Email Address");
     private static final JLabel passwordLabel = new JLabel("Password");
-    public JPasswordField passwordField = new JPasswordField();
+    private static JPasswordField passwordField = new JPasswordField();
     private static final JPanel bottomPanel = new JPanel();
     public JButton signInButton = new JButton("Sign In");
     public JButton signUpButton = new JButton("Have no account ?\nSign Up");
@@ -143,71 +150,71 @@ public class LogInScreen extends JFrame implements Runnable {
         signInButton.addFocusListener(
                 new FocusListener() {
 
-                    @Override
-                    public void focusLost(FocusEvent event) {
+            @Override
+            public void focusLost(FocusEvent event) {
 
-                        //signInButton.setBackground(Color.BLUE);
-                    }
+                //signInButton.setBackground(Color.BLUE);
+            }
 
-                    @Override
-                    public void focusGained(FocusEvent event) {
+            @Override
+            public void focusGained(FocusEvent event) {
 
-                        signInButton.setBackground(Color.GREEN);
-                    }
-                }
+                signInButton.setBackground(Color.GREEN);
+            }
+        }
         );
 
         signUpButton.addFocusListener(
                 new FocusListener() {
 
-                    @Override
-                    public void focusGained(FocusEvent event) {
+            @Override
+            public void focusGained(FocusEvent event) {
 
-                        signUpButton.setBackground(Color.GREEN);
-                    }
+                signUpButton.setBackground(Color.GREEN);
+            }
 
-                    @Override
-                    public void focusLost(FocusEvent event) {
+            @Override
+            public void focusLost(FocusEvent event) {
 
-                        signUpButton.setBackground(Color.BLUE);
-                    }
-                }
+                signUpButton.setBackground(Color.BLUE);
+            }
+        }
         );
 
         passwordField.setCursor(new Cursor(Cursor.TEXT_CURSOR));
         passwordField.addFocusListener(
                 new FocusListener() {
 
-                    @Override
-                    public void focusGained(FocusEvent event) {
+            @Override
+            public void focusGained(FocusEvent event) {
 
-                        passwordField.setBorder(new BevelBorder(BevelBorder.RAISED, Color.BLUE, Color.BLUE));
+                passwordField.setBorder(new BevelBorder(BevelBorder.RAISED, Color.BLUE, Color.BLUE));
 
-                    }
+            }
 
-                    @Override
-                    public void focusLost(FocusEvent event) {
-                        if (passwordField.getText().toString().equals("")) {
+            @Override
+            public void focusLost(FocusEvent event) {
+                if (passwordField.getText().toString().equals("")) {
 
-                            Toolkit.getDefaultToolkit().beep();
-                            passwordField.setBorder(new BevelBorder(BevelBorder.RAISED, Color.RED, Color.RED));
-                        } else {
+                    Toolkit.getDefaultToolkit().beep();
+                    passwordField.setBorder(new BevelBorder(BevelBorder.RAISED, Color.RED, Color.RED));
+                } else {
 
-                            passwordField.setBorder(new BevelBorder(BevelBorder.RAISED, Color.lightGray, Color.lightGray));
-                        }
-                    }
+                    passwordField.setBorder(new BevelBorder(BevelBorder.RAISED, Color.lightGray, Color.lightGray));
                 }
+            }
+        }
         );
 
         //SHOW WELCOME MESSAGE  NOT WORKING
         showMessage("");
 
-        try {
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/gmail", "root", "");
+                Statement sqlStatement = connection.createStatement();) {
 
             String SELECT_QUERY = "SELECT phone_name,emailAddress FROM registration_form ";
-            String dbConnectionurl = "jdbc:mysql://localhost:3306/gmail";
-            Connection connection = DriverManager.getConnection(dbConnectionurl, "root", "");
-            Statement sqlStatement = connection.createStatement();
+           
+
             ResultSet resultSet = sqlStatement.executeQuery(SELECT_QUERY);
 
             while (resultSet.next()) {
@@ -215,10 +222,13 @@ public class LogInScreen extends JFrame implements Runnable {
                 emailsInThe_DB.push(resultSet.getString("emailAddress"));
             }
 
+            //connection.close();
+
         } catch (SQLException e) {
 
             Toolkit.getDefaultToolkit().beep();
-            JOptionPane.showMessageDialog(iconsPanel, e.getMessage());
+           // JOptionPane.showMessageDialog(iconsPanel, e.getMessage());
+           System.err.println("Line 231"+e.getMessage());
 
         } catch (SecurityException e) {
 
@@ -237,21 +247,21 @@ public class LogInScreen extends JFrame implements Runnable {
         emailsFieldBox.addFocusListener(
                 new FocusListener() {
 
-                    @Override
-                    public void focusGained(FocusEvent event) {
+            @Override
+            public void focusGained(FocusEvent event) {
 
-                        emailsFieldBox.setBorder(new BevelBorder(BevelBorder.RAISED, Color.BLUE, Color.BLUE));
+                emailsFieldBox.setBorder(new BevelBorder(BevelBorder.RAISED, Color.BLUE, Color.BLUE));
 
-                    }
+            }
 
-                    @Override
+            @Override
 
-                    public void focusLost(FocusEvent event) {
+            public void focusLost(FocusEvent event) {
 
-                        emailsFieldBox.setBorder(new BevelBorder(BevelBorder.RAISED, Color.RED, Color.RED));
+                emailsFieldBox.setBorder(new BevelBorder(BevelBorder.RAISED, Color.RED, Color.RED));
 
-                    }
-                }
+            }
+        }
         );
 
         emailsFieldBox.setEditable(true);
@@ -277,265 +287,255 @@ public class LogInScreen extends JFrame implements Runnable {
         signInButton.addActionListener(
                 new ActionListener() {
 
-                    @Override
-                    public void actionPerformed(ActionEvent event) {
+            @Override
+            public void actionPerformed(ActionEvent event) {
 
-                        AuthenticateUser();
+                AuthenticateUser();
 
-                    }
-                }
+            }
+        }
         );
 
         signUpButton.addActionListener(
                 new ActionListener() {
 
-                    @Override
+            @Override
 
-                    public void actionPerformed(ActionEvent event) {
+            public void actionPerformed(ActionEvent event) {
 
-                        dispose();
+                dispose();
 
-                        regForm.setVisible(true);
+                regForm.setVisible(true);
 
-                    }
+            }
 
-                }
+        }
         );
 
         //SUBMIT USERS DETAILS TO THE MYSQL DATABASE AND TO THE BACK UP FILE
         regForm.submitButton.addActionListener(
                 new ActionListener() {
 
-                    @Override
+            @Override
 
-                    public void actionPerformed(ActionEvent event) {
+            public void actionPerformed(ActionEvent event) {
 
-                        //reEnteredPassword = new String();
-                        // enteredPassword = new String();
-                        //Retrieve entered data from user  for user
-                        firstName = regForm.firstNameField.getText().toString();
-                        lastName = regForm.lastNameField.getText().toString();
-                        yearOfBirth = regForm.yearsField.getSelectedItem().toString();
-                        phoneNumber = regForm.phoneNumbersField.getText().toString();
-                        emailAddress = regForm.emailAddressField.getText().toString();
-                        password = regForm.passwordField.getText().toString();
-                        reEnteredPassword = regForm.confirmPasswordField.getText().toString();
+                firstName = regForm.firstNameField.getText().toString();
+                lastName = regForm.lastNameField.getText().toString();
+                yearOfBirth = regForm.yearsField.getSelectedItem().toString();
+                phoneNumber = regForm.phoneNumbersField.getText().toString();
+                emailAddress = regForm.emailAddressField.getText().toString();
+                password = regForm.passwordField.getText().toString();
+                reEnteredPassword = regForm.confirmPasswordField.getText().toString();
 
-                        address = regForm.addressField.getSelectedItem().toString();
+                address = regForm.addressField.getSelectedItem().toString();
 
-                        /**
-                         * if (regForm.comparePasswords(enteredPassword,
-                         * reEnteredPassword) == false) { //DO NOT PROCEDD TO
-                         * REGISTER USER IF ENTERED PASSWORDS DO NOT MATCH WITH
-                         * CONFIMR PASSWRD Toolkit.getDefaultToolkit().beep();
-                         * JOptionPane.showMessageDialog(null, "Passwords dont
-                         * match");
-                }*
-                         */
-                        int serialNo;
+                int serialNo;
 
-                        serialNo = (int) (Math.random() * 15555) + 1;
+                serialNo = (int) (Math.random() * 15555) + 1;
 
-                        //WRITE NEW USERS INFORMATION IN A BACK UP FILE backup.txt
-                        File backup = new File("GmailBackup.txt");
+                //WRITE NEW USERS INFORMATION IN A BACK UP FILE backup.txt
+                File backup = new File("GmailBackup.txt");
 
-                        try {
+                createContactsTableForThisUser(firstName, serialNo);
 
-                            FileWriter writer = new FileWriter(backup);
-                            BufferedWriter b_writer = new BufferedWriter(writer);
+                try (FileWriter writer = new FileWriter(backup);
+                        BufferedWriter b_writer = new BufferedWriter(writer);) {
 
-                            b_writer.append("\t\tUnimail Desktop  App\n\t\tPersonal Details  Back Up File\n");
-                            b_writer.newLine();
+                    b_writer.append("\t\tUnimail Desktop  App\n\t\tPersonal Details  Back Up File\n");
+                    b_writer.newLine();
 
-                            b_writer.append("Record:\t " + serialNo);
-                            b_writer.newLine();
-                            b_writer.append("First Name\t" + firstName);
-                            b_writer.newLine();
-                            b_writer.append("Last Name\t" + lastName);
-                            b_writer.newLine();
-                            b_writer.append("Year of Birth\t" + yearOfBirth);
-                            b_writer.newLine();
-                            b_writer.append("Phone Number\t" + phoneNumber);
-                            b_writer.newLine();
-                            b_writer.append("Email Address\t" + emailAddress);
-                            b_writer.newLine();
-                            b_writer.append("Password\t" + password);
-                            b_writer.newLine();
+                    b_writer.append("Record:\t " + serialNo);
+                    b_writer.newLine();
+                    b_writer.append("First Name\t" + firstName);
+                    b_writer.newLine();
+                    b_writer.append("Last Name\t" + lastName);
+                    b_writer.newLine();
+                    b_writer.append("Year of Birth\t" + yearOfBirth);
+                    b_writer.newLine();
+                    b_writer.append("Phone Number\t" + phoneNumber);
+                    b_writer.newLine();
+                    b_writer.append("Email Address\t" + emailAddress);
+                    b_writer.newLine();
+                    b_writer.append("Password\t" + password);
+                    b_writer.newLine();
 
-                            b_writer.flush();
-                            b_writer.close();
+                    b_writer.flush();
+                    b_writer.close();
 
-                        } catch (IOException ex) {
+                } catch (IOException ex) {
 
-                            JOptionPane.showMessageDialog(null, "ERROR line 363" + ex.getMessage());
-                        }
-
-                        //database connection
-                        try {
-
-                            String INSERT_QUERY = "INSERT INTO registration_form VALUES ('" + serialNo + "','" + firstName + "','" + lastName + "','" + phoneNumber + "','" + yearOfBirth + "','" + address + "','" + emailAddress + "','" + password + "')";
-                            Connection serverConnection = DriverManager.getConnection(url, "root", "");
-                            Statement sqlStatement = serverConnection.createStatement();
-
-                            sqlStatement.execute(INSERT_QUERY);
-
-                            JOptionPane.showConfirmDialog(null, "Your details have been succesffuly received \nClick yes to move to your new account", "Desktop Gmail", JOptionPane.YES_NO_OPTION);
-
-                            regForm.setVisible(false);
-                            int option = JOptionPane.showConfirmDialog(bottomPanel, "You can now log in with your new account\n just click YES ", "", JOptionPane.OK_CANCEL_OPTION);
-
-                            if (option == JOptionPane.OK_OPTION) {
-
-                                pack();
-                                show();
-
-                            } else {
-
-                                regForm.setVisible(true);
-                            }
-
-                        } catch (SQLException ex) {
-
-                            Toolkit.getDefaultToolkit().beep();
-                            JOptionPane.showMessageDialog(null, "Well thie is embarrasing but we couldn't connect to the server Details:\n" + ex.getMessage());
-                        }
-
-                    }
+                    JOptionPane.showMessageDialog(null, "ERROR 404:\n\t" + ex.getMessage());
 
                 }
+
+                //database connection on try-with resources
+                try (Connection serverConnection = DriverManager.getConnection("jdbs:mysql://localhost:3306/gmail", "root", "");
+                        Statement sqlStatement = serverConnection.createStatement();) {
+
+                    String INSERT_QUERY = "INSERT INTO registration_form VALUES ('" + serialNo + "','" + firstName + "','" + lastName + "','" + phoneNumber + "','" + yearOfBirth + "','" + address + "','" + emailAddress + "','" + password + "')";
+                    sqlStatement.execute(INSERT_QUERY);
+
+                    JOptionPane.showConfirmDialog(null, "Your details have been succesffuly received \nClick yes to move to your new account", "Desktop Gmail", JOptionPane.YES_NO_OPTION);
+
+                    regForm.setVisible(false);
+                    int option = JOptionPane.showConfirmDialog(bottomPanel, "You can now log in with your new account\n just click YES ", "", JOptionPane.OK_CANCEL_OPTION);
+
+                    if (option == JOptionPane.OK_OPTION) {
+
+                        pack();
+                        show();
+
+                    } else {
+
+                        regForm.setVisible(true);
+                    }
+
+                    serverConnection.close();
+
+                } catch (SQLException ex) {
+
+                    Toolkit.getDefaultToolkit().beep();
+                    //JOptionPane.showMessageDialog(null, "Well thie is embarrasing but we couldn't connect to the server Details:\n" + ex.getMessage());
+                    System.err.println("Line 400"+ex.getMessage());
+                }
+
+            }
+
+        }
         );
 
         regForm.signInButton.addActionListener(
                 new ActionListener() {
 
-                    @Override
-                    public void actionPerformed(ActionEvent event) {
+            @Override
+            public void actionPerformed(ActionEvent event) {
 
-                        regForm.setVisible(false);
-                        setVisible(true);
-                    }
-                }
+                regForm.setVisible(false);
+                setVisible(true);
+            }
+        }
         );
 
         //CHECK LOG IN SCREEN FIELD !NULL
         passwordField.addKeyListener(
                 new KeyListener() {
 
-                    @Override
-                    public void keyPressed(KeyEvent event) {
-                    }
+            @Override
+            public void keyPressed(KeyEvent event) {
+            }
 
-                    @Override
-                    public void keyReleased(KeyEvent event) {
-                        ableToLogIn(true);
-                    }
+            @Override
+            public void keyReleased(KeyEvent event) {
+                ableToLogIn(true);
+            }
 
-                    @Override
-                    public void keyTyped(KeyEvent event) {
-                    }
+            @Override
+            public void keyTyped(KeyEvent event) {
+            }
 
-                }
+        }
         );
         //BLOCK NOT WORKING I.E. MAKE SIGN IN BUTTON DISABLE(TRUE) IF EMAILS FIELD == NULL
         passwordField.addActionListener(
                 new ActionListener() {
 
-                    @Override
-                    public void actionPerformed(ActionEvent event) {
-                        if (!event.getActionCommand().equals("")) {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                if (!event.getActionCommand().equals("")) {
 
-                            ableToLogIn(true);
+                    ableToLogIn(true);
 
-                        } else if (event.getActionCommand().equals("")) {
+                } else if (event.getActionCommand().equals("")) {
 
-                            ableToLogIn(false);
-                        }
-                    }
+                    ableToLogIn(false);
                 }
+            }
+        }
         );
 
         //CHECK FIELD FOR TEXT TO ENABLE SUBMIT
         regForm.firstNameField.addKeyListener(
                 new KeyListener() {
 
-                    @Override
-                    public void keyReleased(KeyEvent event) {
-                        ableToSubmit(true);
-                    }
+            @Override
+            public void keyReleased(KeyEvent event) {
+                ableToSubmit(true);
+            }
 
-                    @Override
-                    public void keyPressed(KeyEvent event) {
+            @Override
+            public void keyPressed(KeyEvent event) {
 
-                    }
+            }
 
-                    @Override
-                    public void keyTyped(KeyEvent event) {
+            @Override
+            public void keyTyped(KeyEvent event) {
 
-                    }
-                }
+            }
+        }
         );
 
         regForm.lastNameField.addKeyListener(
                 new KeyListener() {
 
-                    @Override
-                    public void keyReleased(KeyEvent event) {
-                        ableToSubmit(true);
-                    }
+            @Override
+            public void keyReleased(KeyEvent event) {
+                ableToSubmit(true);
+            }
 
-                    @Override
-                    public void keyPressed(KeyEvent event) {
+            @Override
+            public void keyPressed(KeyEvent event) {
 
-                    }
+            }
 
-                    @Override
-                    public void keyTyped(KeyEvent event) {
+            @Override
+            public void keyTyped(KeyEvent event) {
 
-                    }
-                }
+            }
+        }
         );
 
         regForm.passwordField.addKeyListener(
                 new KeyListener() {
 
-                    @Override
-                    public void keyReleased(KeyEvent event) {
+            @Override
+            public void keyReleased(KeyEvent event) {
 
-                        ableToSubmit(true);
+                ableToSubmit(true);
 
-                    }
+            }
 
-                    @Override
-                    public void keyPressed(KeyEvent event) {
+            @Override
+            public void keyPressed(KeyEvent event) {
 
-                    }
+            }
 
-                    @Override
-                    public void keyTyped(KeyEvent event) {
+            @Override
+            public void keyTyped(KeyEvent event) {
 
-                    }
-                }
+            }
+        }
         );
 
         regForm.passwordField.addKeyListener(
                 new KeyListener() {
 
-                    @Override
-                    public void keyReleased(KeyEvent event) {
+            @Override
+            public void keyReleased(KeyEvent event) {
 
-                        ableToSubmit(true);
-                    }
+                ableToSubmit(true);
+            }
 
-                    @Override
-                    public void keyPressed(KeyEvent event) {
+            @Override
+            public void keyPressed(KeyEvent event) {
 
-                    }
+            }
 
-                    @Override
-                    public void keyTyped(KeyEvent event) {
+            @Override
+            public void keyTyped(KeyEvent event) {
 
-                    }
-                }
+            }
+        }
         );
     }
 
@@ -544,13 +544,13 @@ public class LogInScreen extends JFrame implements Runnable {
         SwingUtilities.invokeLater(
                 new Runnable() {
 
-                    @Override
-                    public void run() {
+            @Override
+            public void run() {
 
-                        regForm.submitButton.setEnabled(isAble);
+                regForm.submitButton.setEnabled(isAble);
 
-                    }
-                }
+            }
+        }
         );
 
     }
@@ -561,54 +561,59 @@ public class LogInScreen extends JFrame implements Runnable {
         SwingUtilities.invokeLater(
                 new Runnable() {
 
-                    @Override
-                    public void run() {
+            @Override
+            public void run() {
 
-                        try {
+                try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/gmail", "root", "");
+                        Statement sql_statement = connection.createStatement();) {
 
-                            enteredPassword = passwordField.getText().toString();
-                            enteredEmailAddress = emailsFieldBox.getSelectedItem().toString();
+                    enteredPassword = passwordField.getText().toString();
+                    enteredEmailAddress = emailsFieldBox.getSelectedItem().toString();
 
-                            Connection connection = DriverManager.getConnection(url, "root", "");
-                            Statement sql_statement = connection.createStatement();
-                            String SELECT_QUERY = "SELECT password, first_name FROM registration_form WHERE emailAddress = " + "'" + enteredEmailAddress + "';";
-                            ResultSet queryResults = sql_statement.executeQuery(SELECT_QUERY);
+                    String SELECT_QUERY = "SELECT password, first_name FROM registration_form WHERE emailAddress = " + "'" + enteredEmailAddress + "';";
+                    ResultSet queryResults = sql_statement.executeQuery(SELECT_QUERY);
 
-                            while (queryResults.next()) {
+                    while (queryResults.next()) {
 
-                                //add all emails to the eamails stack
-                                System.err.println("line 356 (while loop) is executed");
-                                passwordsStack.push(queryResults.getString("password"));
-                                userName = queryResults.getString("first_name");
-                                System.err.println("line 359 (while loop) is executed");
-                            }
-                            //Compare entered password
-                            if (passwordsStack.search(enteredPassword) == -1) {
-                                setVisible(true);
-                                passwordField.setBorder(new BevelBorder(BevelBorder.RAISED, Color.RED, Color.RED));
-                                inboxFrame.setVisible(false);
-                                errorWindow.setForeground(Color.red);
-                                Toolkit.getDefaultToolkit().beep();
-                                showMessage("\t\tWRONG PASSWORD");
-
-                            } else if (passwordsStack.search(enteredPassword) >= 0) {
-
-                                showMessage("SUCCESSFULL");
-                                passwordField.setBorder(new BevelBorder(BevelBorder.RAISED, Color.BLUE, Color.BLUE));
-                                emailsFieldBox.setBorder(new BevelBorder(BevelBorder.RAISED, Color.BLUE, Color.BLUE));
-                                JOptionPane.showMessageDialog(iconsPanel, "\tSuccessfull\nWelcom to your account");
-                                remove(credentialsPanel);
-                                setVisible(false);
-                                inboxFrame.setVisible(true);
-                                inboxFrame.setTitle(userName);
-                            }
-
-                        } catch (SQLException e) {
-
-                            JOptionPane.showMessageDialog(null, "" + e.getMessage());
-                        }
+                        //add all emails to the eamails stack
+                        System.err.println("line 356 (while loop) is executed");
+                        passwordsStack.push(queryResults.getString("password"));
+                        userName = queryResults.getString("first_name");
+                        System.err.println("line 359 (while loop) is executed");
                     }
+                    //Compare entered password
+                    if (passwordsStack.search(enteredPassword) == -1) {
+                        setVisible(true);
+                        passwordField.setBorder(new BevelBorder(BevelBorder.RAISED, Color.RED, Color.RED));
+                        inboxFrame.setVisible(false);
+                        errorWindow.setForeground(Color.red);
+                        Toolkit.getDefaultToolkit().beep();
+                        showMessage("\t\tWRONG PASSWORD");
+
+                    } else if (passwordsStack.search(enteredPassword) >= 0) {
+
+                        showMessage("SUCCESSFULL");
+                        passwordField.setBorder(new BevelBorder(BevelBorder.RAISED, Color.BLUE, Color.BLUE));
+                        emailsFieldBox.setBorder(new BevelBorder(BevelBorder.RAISED, Color.BLUE, Color.BLUE));
+                        JOptionPane.showMessageDialog(iconsPanel, "\tSuccessfull\nWelcom to your account");
+                        remove(credentialsPanel);
+                        setVisible(false);
+                        inboxFrame.setVisible(true);
+                        inboxFrame.setTitle(userName);
+
+                        setApplicationContextData(enteredEmailAddress, userName);
+                        setInstanceUser(enteredEmailAddress, userName);
+
+                        //connection.close();
+                    }
+
+                } catch (SQLException e) {
+
+                    //JOptionPane.showMessageDialog(null, "" + e.getMessage());
+                    System.err.println("Line 613"+e.getMessage());
                 }
+            }
+        }
         );
     }
 
@@ -618,17 +623,17 @@ public class LogInScreen extends JFrame implements Runnable {
         SwingUtilities.invokeLater(
                 new Runnable() {
 
-                    @Override
+            @Override
 
-                    public void run() {
-                        
-                        errorWindow.setFont(new Font("Times New Roman",Font.BOLD,14));
-                        errorWindow.setBackground(Color.white);
+            public void run() {
 
-                        errorWindow.setText(errorMessage);
+                errorWindow.setFont(new Font("Times New Roman", Font.BOLD, 14));
+                errorWindow.setBackground(Color.white);
 
-                    }
-                }
+                errorWindow.setText(errorMessage);
+
+            }
+        }
         );
     }
 
@@ -638,14 +643,14 @@ public class LogInScreen extends JFrame implements Runnable {
         SwingUtilities.invokeLater(
                 new Runnable() {
 
-                    @Override
+            @Override
 
-                    public void run() {
+            public void run() {
 
-                        signInButton.setEnabled(canLogIn);
+                signInButton.setEnabled(canLogIn);
 
-                    }
-                }
+            }
+        }
         );
 
     }
@@ -668,33 +673,66 @@ public class LogInScreen extends JFrame implements Runnable {
 
     }
 
-    /**
-     * public static void main(String[] args) {
-     *
-     * javax.swing.SwingUtilities.invokeLater( new Runnable() {
-     *
-     * @Override
-     *
-     * public void run() {
-     *
-     * try {
-     *
-     * Thread.sleep(12000);
-     *
-     * new LogInScreen();
-     *
-     * } catch (InterruptedException e) {
-     *
-     * System.out.println("The thread was interrupted...");
-     * JOptionPane.showMessageDialog(null,"Unfortunately the application has
-     * stopped workong...");
-     *
-     * }
-     * }
-     * }
-     * ); //new
-     *
-     * //LogInScreen().setVisible(true);
-    }*
-     */
+    //Create a contacts table for each registered user
+    public void createContactsTableForThisUser(String userName, int UniqueserialNumber) {
+
+        try (Connection sqlConnection = DriverManager.getConnection(url, "root", "");
+                Statement sqlQueryStatements = sqlConnection.createStatement();) {
+
+            String SQL_CREATE_QUERY = "CREATE TABLE ContactsFor_" + userName + "(Name varchar(20),Phone int(20),Email varchar(20),Address varchar(20),Groups varchar(20));";
+            sqlQueryStatements.executeUpdate(SQL_CREATE_QUERY);
+
+            System.out.println("Table was created successfuly");
+
+            //sqlConnection.close();
+
+        } catch (SQLException e) {
+
+            System.err.println("ERROR ON CREATE TABLE REQUEST:" + e.getMessage());
+        }
+    }
+
+    //Create a temporary state for the user
+    public void setApplicationContextData(String currentUsersEmailAddress, String userName) {
+
+        //Obtain meta data about current user from registration form database
+        try (Connection newDBConnection = DriverManager.getConnection(url, "root", "");
+                Statement newSqlStatements = newDBConnection.createStatement();) {
+
+            String SQL_INSERT_QUERY = "INSERT INTO ApplicationContext VALUES('"+userName+"','"+currentUsersEmailAddress+"','"+currentTime.getYear()+"-"+currentTime.getMonth()+"-"+currentTime.getDay()+"','Kakamega','offline','"+currentTime.getHours()+currentTime.getMinutes()+currentTime.getSeconds()+"');";
+            newSqlStatements.executeUpdate(SQL_INSERT_QUERY);
+
+            System.err.println("Application user data was succefully updated...");
+            //newDBConnection.close();
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+        }
+    }
+
+    //Register the user ass online
+    public void setInstanceUser(String currentUserEmailAddress, String userName) {
+
+        try (Connection dbConnection = DriverManager.getConnection(url,"root","");
+                Statement sqlStmts = dbConnection.createStatement();) {
+            
+            String SQL_INSERT_QUERY = "INSERT INTO instancetaneouseApplicationContext VALUES('" + userName + "','" + currentUserEmailAddress + "');";
+            sqlStmts.executeUpdate(SQL_INSERT_QUERY);
+            
+            System.err.println("Instance use succefully registered!!");
+            
+        } catch (SQLException e) {
+            System.err.println("Line 726");
+            e.printStackTrace();
+        }
+    }
+
+    //Override Automatic Resource Management(ARM)  interface method to autoclose all resources
+    @Override
+    public void close() {
+
+        System.err.println("All resources are now closed...");
+    }
+
 }

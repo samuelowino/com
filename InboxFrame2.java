@@ -15,15 +15,20 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JComboBox;
-import javax.swing.ImageIcon;
 import javax.swing.border.LineBorder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import java.sql.SQLException;
+import java.sql.ResultSet;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
 
 import java.awt.Desktop;
 import java.awt.Color;
@@ -44,16 +49,14 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 
-public class InboxFrame2 extends JFrame {
+public class InboxFrame2 extends JFrame implements AutoCloseable {
 
     private static String[] typesOfMesssages = {"All", "Flagged", "Unread"};
-    private static JComboBox allComboBox;
-    private static JButton searchButton;
-    private static JPanel onInboxPanel;
-    private static JLabel inboxPanelLable;
-    private static ImageIcon searchImage;
+    private static String dbConnectioURL = "jdbc:mysql://localhost:3306/gmail";
+    private static List<String> contactsInformation = new ArrayList<>();
+    private static String currentUser;
+    private static String currentUsersEmail;
     private static JTextField panelSearchField;
-    private static LineBorder lineInboxLabelBorder;
 
     private static JPanel draftsPanel;
     private static JPanel inboxPanel;
@@ -68,7 +71,6 @@ public class InboxFrame2 extends JFrame {
     private static JSplitPane splitPane;
     private static JPanel leftPanel;
     private static JPanel rightPanel;
-    private static JButton inboxButton;
 
     private static JLabel inboxLabel;
     private static JLabel outBoxLabel;
@@ -77,7 +79,6 @@ public class InboxFrame2 extends JFrame {
     private static JLabel junkLabel;
     private static JLabel sentLabel;
 
-    private static JComboBox emailFieldBox;
     private static JMenuBar menuBar;
     private static JMenuItem menuItem;
     private static JMenuItem newFile;
@@ -149,6 +150,7 @@ public class InboxFrame2 extends JFrame {
     private static URL helpHTMLPage;
 
     private static logInScreen2 logInScreen;
+    private static LogInScreen logInScrn;
 
     public InboxFrame2() {
 
@@ -161,8 +163,6 @@ public class InboxFrame2 extends JFrame {
         //USE TOOLKIT TO OBTASIN SCREEN SIZE
         Toolkit kit = Toolkit.getDefaultToolkit();
         Dimension screenSize = kit.getScreenSize();
-        int screenWidth = screenSize.width;
-        int screenHeight = screenSize.height;
 
         setSize(800, 660);
         //setVisible(true);
@@ -199,9 +199,6 @@ public class InboxFrame2 extends JFrame {
         junkPanel.setLayout(null);
         sentPanel.setLayout(null);
 
-        System.err.println("Drafts Panel SIZE: width" + draftsPanel.getSize().width + "\nHeight: " + draftsPanel.getSize().height + "\nLocation(" + draftsPanel.getLocation().x + "," + draftsPanel.getLocation().y + ")");
-        System.err.println("new Mail Panel SIZE: width" + newMailPanel.getSize().width + "\nHeight: " + newMailPanel.getSize().height + "\nLocation(" + draftsPanel.getLocation().x + "," + draftsPanel.getLocation().y + ")");
-
         //SET UP DYNAMIC PANEL COMPONENTS
         //I.SEARCH FIELD
         searchField = new JTextField(100);
@@ -228,7 +225,7 @@ public class InboxFrame2 extends JFrame {
         outBoxLabel.setBounds(0, 30, 559, 30);
         outBoxLabel.setFont(new Font("Times New Roman", Font.BOLD, 16));
         outBoxLabel.setBorder(new LineBorder(Color.lightGray));
-        
+
         junkLabel = new JLabel("Junk");
         junkLabel.setBounds(0, 30, 559, 30);
         junkLabel.setFont(new Font("Times New Roman", Font.BOLD, 16));
@@ -238,7 +235,7 @@ public class InboxFrame2 extends JFrame {
         sentLabel.setBounds(0, 30, 559, 30);
         sentLabel.setFont(new Font("Times New Roman", Font.BOLD, 16));
         sentLabel.setBorder(new LineBorder(Color.lightGray));
-        
+
         String[] folderContnets = {"Folders\t\t", "\t\t", "\t\t", "New Mail\t\t", "\t\t", "\t\t", "Inbox\t\t", "\t\t", "\t\t", "Outbox\t\t", "\t\t", "\t\t", "Drafts\t\t", "\t\t", "\t\t", "junk\t\t", "\t\t", "\t\t", "sent\t\t", "  \t\t"};
         folders = new JList(folderContnets);
         folders.setBackground(Color.BLUE);
@@ -371,7 +368,6 @@ public class InboxFrame2 extends JFrame {
 
         profileMenu.setFont(myFont);
         profileMenu.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        //profileMenu.setBackground(Color.WHITE);
         profileMenu.add(new JMenuItem());
         profileMenu.addSeparator();
         profileMenu.add(viewProfile);
@@ -467,7 +463,6 @@ public class InboxFrame2 extends JFrame {
         menuBar = new JMenuBar();
         menuBar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         menuBar.setBackground(Color.BLUE);
-        // menuBar.setSize(this.getMaximumSize().width,400);
         menuBar.setForeground(Color.WHITE);
 
         fileMenu.setForeground(Color.WHITE);
@@ -516,7 +511,6 @@ public class InboxFrame2 extends JFrame {
         panelSearchField.setBounds(rightPanel.getLocation().x, rightPanel.getLocation().y, rightPanel.getSize().width, 00);
         rightPanel.add(panelSearchField);
         leftPanel.setLayout(new GridLayout(1, 1, 1, 1));
-        //rightPanel.add( new JLabel("Welcome to your in box this section is still under construction"), new FlowLayout(FlowLayout.CENTER));
 
         folders.setFont(myFont);
         leftPanel.add(folders);
@@ -592,6 +586,7 @@ public class InboxFrame2 extends JFrame {
                 int option = JOptionPane.showConfirmDialog(null, "Are you sure you want to exit ?", "", JOptionPane.YES_NO_OPTION);
                 if (option == JOptionPane.YES_OPTION) {
 
+                    deleteInstanceUserData(getCurrentUser());
                     setVisible(false);
                     dispose();
                     System.exit(0);
@@ -668,6 +663,8 @@ public class InboxFrame2 extends JFrame {
                     splitPane.setRightComponent(draftsPanel);
                     splitPane.repaint();
 
+                    //@beta
+                    //getContacts();
                     //SET FOCUS LISTENER FOR THE SEARCH FIELD
                     searchField.addFocusListener(
                             new FocusListener() {
@@ -844,6 +841,18 @@ public class InboxFrame2 extends JFrame {
 
         getMenuBarMouseEvent();
 
+        //ADD ACTION LISTENER FOR VIEW CONTACTS MENU ITEM
+        viewAllContacts.addActionListener(
+                new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+
+                getContacts(getCurrentUser());
+            }
+        }
+        );
+
         //ADD SPLIT PANE AND MENU BAR TO THE 
         add(splitPane);
         setJMenuBar(menuBar);
@@ -878,7 +887,6 @@ public class InboxFrame2 extends JFrame {
             @Override
             public void mouseReleased(MouseEvent event) {
                 //object.setBackground(Color.BLUE);
-                //DO NOTHING
             }
         }
         );
@@ -980,8 +988,6 @@ public class InboxFrame2 extends JFrame {
         try {
 
             String helpContent;
-            helpHTMLPage = new URL("file:///C:/Users/user/Desktop/NetBeans%20Java%20Projects/GmailDesktopApp/src/com/JavaTestPage/thePage2.html");
-            b_reader = new BufferedReader(new InputStreamReader(helpHTMLPage.openConnection().getInputStream()));
 
             while ((helpContent = b_reader.readLine()) != null) {
 
@@ -1011,6 +1017,94 @@ public class InboxFrame2 extends JFrame {
 
             System.err.println("ERROR:" + e.getMessage());
         }
+    }
+
+    //GET CURRENT LOGGED IN USER
+    public String getCurrentUser() {
+
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/gmail", "root", "");
+                Statement sqlStatmt = connection.createStatement()) {
+
+            String SQL_SELECT_QUERY = "SELECT * FROM instancetaneouseApplicationContext";
+            ResultSet queryResults = sqlStatmt.executeQuery(SQL_SELECT_QUERY);
+
+            while (queryResults.next()) {
+
+                 currentUser = queryResults.getString("currentLoggedInUser");
+                 currentUsersEmail = queryResults.getString("userEmail");
+
+            }
+
+            System.err.println("CURRENT USER'S DATA:\nUser Name :" + currentUser + "\nUser Email" + currentUsersEmail);
+
+            connection.close();
+
+        } catch (SQLException e) {
+
+            //JOptionPane.showMessageDialog(null, "404 ERROR" + e.getMessage(), "UniMessenger", JOptionPane.WARNING_MESSAGE);
+            System.out.println("Line 1047 inbox"+e.getMessage());
+        }
+        
+        return currentUsersEmail;
+    }
+
+    //CLEAR INSTANCE USER DATA
+    public void deleteInstanceUserData(String userEmail) {
+
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/gmail", "root", "");
+                Statement mysqlStatements = connection.createStatement();) {
+
+            String DELETE_QUERY = "DELETE FROM instancetaneouseApplicationContext WHERE userEmail = '" + userEmail + "';";
+            mysqlStatements.executeUpdate(DELETE_QUERY);
+
+            System.err.println("Instance user succefully deleted from the database!");
+            connection.close();
+
+        } catch (SQLException e) {
+
+            JOptionPane.showMessageDialog(null, "404 ERROR" + e.getMessage(), "UniMessenger", JOptionPane.WARNING_MESSAGE);
+            System.out.println("Line 1067"+e.getMessage());
+        }
+    }
+
+    //RETRIVE ALL CONTACTS RELATED TO CURRENT USER FROM DB USING APPLICATION CONTEXT
+    public void getContacts( String currentUsersEmail) {
+
+        //Retrieve application context data
+        try (Connection sqlConnection = DriverManager.getConnection("jdbc:mysql://localhost:3306/gmail", "root", "");
+                Statement sqlStatement = sqlConnection.createStatement();) {
+
+            String SELECT_QUERY = "SELECT * FROM contactsfor_" + currentUser;
+            ResultSet queryResults = sqlStatement.executeQuery(SELECT_QUERY);
+
+            //PROCESS DATA
+            while (queryResults.next()) {
+
+                contactsInformation.add(queryResults.getString("Name"));
+                contactsInformation.add(queryResults.getString("Phone"));
+                contactsInformation.add(queryResults.getString("Email"));
+                contactsInformation.add(queryResults.getString("Address"));
+                contactsInformation.add(queryResults.getString("Groups"));
+
+            }
+
+            for (int i = 0; i < contactsInformation.size(); i++) {
+
+                System.err.println("User " + contactsInformation.get(i));
+
+            }
+        } catch (SQLException e) {
+
+            //JOptionPane.showMessageDialog(menuBar, "404 ERROR : CURRENT USER NOT RECOGNISED !!", "UniMesseger\n\t" + e.getMessage(), JOptionPane.WARNING_MESSAGE);
+            System.err.println("Line 1100"+e.getMessage());
+        }
+
+    }
+
+    @Override
+    public void close() {
+
+        System.err.println("All resources are now automatically closed by the ARM(Java 7 autocloseable interface)");
     }
 
     public static void main(String[] args) {
