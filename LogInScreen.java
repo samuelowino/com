@@ -6,7 +6,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Toolkit;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.KeyListener;
 import java.awt.event.KeyEvent;
@@ -15,14 +14,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusListener;
-import java.awt.Image;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import java.util.Calendar;
 
 import java.beans.PropertyChangeListener;
 
@@ -32,7 +29,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
-import java.util.TimeZone;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -48,7 +44,8 @@ import javax.swing.border.BevelBorder;
 
 //@SuppressWarnings(unchecked);
 public class LogInScreen extends JFrame implements Runnable, AutoCloseable {
-
+    
+    private static JLabel newContactsLabel2nd;
     public String currentUser;
     private static JFrame progressBarWindow;
     private static final String url = "jdbc:mysql://localhost:3306/gmail";
@@ -81,6 +78,7 @@ public class LogInScreen extends JFrame implements Runnable, AutoCloseable {
     private static String address;
     private static JLabel imgLabel;
     private static ImageIcon imgIcon;
+    private static ImageIcon addIcon;
     private static PropertyChangeListener listerner;
 
     public LogInScreen() {
@@ -110,7 +108,11 @@ public class LogInScreen extends JFrame implements Runnable, AutoCloseable {
 
         imgIcon = new ImageIcon(getClass().getResource("img.png"));
         imgLabel = new JLabel(imgIcon);
-
+        
+        
+        
+        newContactsLabel2nd = new JLabel();
+        
         signInButton.setMnemonic(KeyEvent.VK_ENTER);
         signInButton.setForeground(Color.WHITE);
         signUpButton.setForeground(Color.WHITE);

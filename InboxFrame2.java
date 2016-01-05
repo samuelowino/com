@@ -46,16 +46,19 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import javax.swing.ImageIcon;
 
 public class InboxFrame2 extends JFrame implements AutoCloseable {
 
     private static String[] typesOfMesssages = {"All", "Flagged", "Unread"};
     private static String dbConnectioURL = "jdbc:mysql://localhost:3306/gmail";
     private static List<String> contactsInformation = new ArrayList<>();
-    private static HashMap<String,String> currentUserData = new HashMap<>();
+    private static HashMap<String, String> currentUserData = new HashMap<>();
     private static String currentUser;
     private static String currentUsersEmail;
     private static JTextField panelSearchField;
@@ -66,6 +69,8 @@ public class InboxFrame2 extends JFrame implements AutoCloseable {
     private static JPanel newMailPanel;
     private static JPanel junkPanel;
     private static JPanel sentPanel;
+    private static JPanel addNewContactPanel;
+    private static JLabel addNewContactLabel;
 
     private static JTextField searchField;
 
@@ -74,12 +79,19 @@ public class InboxFrame2 extends JFrame implements AutoCloseable {
     private static JPanel leftPanel;
     private static JPanel rightPanel;
 
+    private static JLabel secondAddContactsLabel;
     private static JLabel inboxLabel;
     private static JLabel outBoxLabel;
     private static JLabel newMailLabel;
     private static JLabel draftsLabel;
     private static JLabel junkLabel;
     private static JLabel sentLabel;
+    private static JLabel newContact;
+    private static JLabel nameFieldLabel;
+    private static JLabel phoneFieldLabel;
+    private static JLabel addressFieldLabel;
+    private static JLabel emailFieldLabel;
+    private static JLabel categoryFieldLabel;
 
     private static JMenuBar menuBar;
     private static JMenuItem menuItem;
@@ -147,12 +159,11 @@ public class InboxFrame2 extends JFrame implements AutoCloseable {
     private static JMenu viewMenu;
     private static JMenu logOutMenu;
     private static JList folders;
+    private static ImageIcon addIcon;
 
     private static BufferedReader b_reader;
-    private static URL helpHTMLPage;
 
     private static logInScreen2 logInScreen;
-    private static LogInScreen logInScrn;
 
     public InboxFrame2() {
 
@@ -160,7 +171,6 @@ public class InboxFrame2 extends JFrame implements AutoCloseable {
         super("InboxFrame2");
         logInScreen = new logInScreen2();
         //SET UP THE UI MANAGEMENT CODE
-        // UIManager.put("JMenu.background",Color.BLUE);
 
         //USE TOOLKIT TO OBTASIN SCREEN SIZE
         Toolkit kit = Toolkit.getDefaultToolkit();
@@ -173,6 +183,10 @@ public class InboxFrame2 extends JFrame implements AutoCloseable {
         getContentPane().setBackground(Color.BLUE);
         // pack();
 
+        addIcon = new ImageIcon(getClass().getResource("addIcon.png"));
+        secondAddContactsLabel = new JLabel(addIcon);
+        
+        
         //SET UP DYNAMIC PANELS
         draftsPanel = new JPanel();
         sentMailPanel = new JPanel();
@@ -180,13 +194,16 @@ public class InboxFrame2 extends JFrame implements AutoCloseable {
         newMailPanel = new JPanel();
         junkPanel = new JPanel();
         sentPanel = new JPanel();
+        addNewContactPanel = new JPanel();
 
-        draftsPanel.setBackground(Color.BLUE);
-        sentMailPanel.setBackground(Color.DARK_GRAY);
-        inboxPanel.setBackground(Color.yellow);
-        newMailPanel.setBackground(Color.red);
-        junkPanel.setBackground(Color.CYAN);
-        sentPanel.setBackground(Color.orange);
+        addNewContactPanel.setBackground(Color.WHITE);
+        draftsPanel.setBackground(Color.WHITE);
+        sentMailPanel.setBackground(Color.WHITE);
+        inboxPanel.setBackground(Color.WHITE);
+        newMailPanel.setBackground(Color.WHITE);
+        junkPanel.setBackground(Color.WHITE);
+        sentPanel.setBackground(Color.WHITE);
+        addNewContactPanel.setSize(559, getSize().height);
         inboxPanel.setSize(559, getSize().height);
         newMailPanel.setSize(559, getSize().height);
         junkPanel.setSize(559, getSize().height);
@@ -194,12 +211,20 @@ public class InboxFrame2 extends JFrame implements AutoCloseable {
         draftsPanel.setSize(559, getSize().height);
         sentMailPanel.setSize(559, getSize().height);
 
+        addNewContactPanel.setLayout(null);
         draftsPanel.setLayout(null);
         sentMailPanel.setLayout(null);
         inboxPanel.setLayout(null);
         newMailPanel.setLayout(null);
         junkPanel.setLayout(null);
         sentPanel.setLayout(null);
+        
+        secondAddContactsLabel.setBounds(10,60,30,30);
+        newContact = new JLabel("New Contact");
+        newContact.setFont( new Font("Times New Roman",Font.BOLD,14));
+        newContact.setBounds(45,60,559,30);
+        newContact.setForeground(Color.BLUE);
+        
 
         //SET UP DYNAMIC PANEL COMPONENTS
         //I.SEARCH FIELD
@@ -207,36 +232,55 @@ public class InboxFrame2 extends JFrame implements AutoCloseable {
         searchField.setText("Search");
         searchField.setBounds(0, 0, 559, 30);
 
+        //DESING ADD NEW CONTACTS FORM
+        nameFieldLabel = new JLabel("Name");
+        nameFieldLabel.setForeground(Color.BLUE);
+        nameFieldLabel.setFont( new Font("Times New Roman",Font.BOLD,14));
+        nameFieldLabel.setBounds(45,100,100,30);
+        
         //II.INBOX,DRAFT,JUNK, SENT AND NEWMAIL LABELS
+        addNewContactLabel = new JLabel("New Contact");
+        addNewContactLabel.setForeground(Color.BLUE);
+        addNewContactLabel.setBounds(0, 30, 559, 30);
+        addNewContactLabel.setFont(new Font("Times New Roman", Font.BOLD, 16));
+        addNewContactLabel.setBorder(new LineBorder(Color.lightGray));
+       
+
         inboxLabel = new JLabel("Inbox");
         inboxLabel.setBounds(0, 30, 559, 30);
         inboxLabel.setFont(new Font("Times New Roman", Font.BOLD, 16));
         inboxLabel.setBorder(new LineBorder(Color.lightGray));
+        inboxLabel.setForeground(Color.BLUE);
 
         newMailLabel = new JLabel("New Mail");
         newMailLabel.setBounds(0, 30, 559, 30);
         newMailLabel.setFont(new Font("Times New Roman", Font.BOLD, 16));
         newMailLabel.setBorder(new LineBorder(Color.lightGray));
+        newMailLabel.setForeground(Color.BLUE);
 
         draftsLabel = new JLabel("Drafts");
         draftsLabel.setBounds(0, 30, 559, 30);
         draftsLabel.setFont(new Font("Times New Roman", Font.BOLD, 16));
         draftsLabel.setBorder(new LineBorder(Color.lightGray));
+        draftsLabel.setForeground(Color.BLUE);
 
         outBoxLabel = new JLabel("OutBox");
         outBoxLabel.setBounds(0, 30, 559, 30);
         outBoxLabel.setFont(new Font("Times New Roman", Font.BOLD, 16));
         outBoxLabel.setBorder(new LineBorder(Color.lightGray));
+        outBoxLabel.setForeground(Color.BLUE);
 
         junkLabel = new JLabel("Junk");
         junkLabel.setBounds(0, 30, 559, 30);
         junkLabel.setFont(new Font("Times New Roman", Font.BOLD, 16));
         junkLabel.setBorder(new LineBorder(Color.lightGray));
+        junkLabel.setForeground(Color.BLUE);
 
         sentLabel = new JLabel("Sent Mails");
         sentLabel.setBounds(0, 30, 559, 30);
         sentLabel.setFont(new Font("Times New Roman", Font.BOLD, 16));
         sentLabel.setBorder(new LineBorder(Color.lightGray));
+        sentLabel.setForeground(Color.BLUE);
 
         String[] folderContnets = {"Folders\t\t", "\t\t", "\t\t", "New Mail\t\t", "\t\t", "\t\t", "Inbox\t\t", "\t\t", "\t\t", "Outbox\t\t", "\t\t", "\t\t", "Drafts\t\t", "\t\t", "\t\t", "junk\t\t", "\t\t", "\t\t", "sent\t\t", "  \t\t"};
         folders = new JList(folderContnets);
@@ -856,13 +900,44 @@ public class InboxFrame2 extends JFrame implements AutoCloseable {
         );
 
         //ADD ACTION LISTENER TO THE ADD NEW CONTACTS MENU ITEM
-        addNewContacts.addActionListener(
-                new ActionListener() {
+        addNewContacts.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent event) {
 
                 addContacts(getCurrentUser().get("usersName"));
+
+                splitPane.remove(rightPanel);
+                addNewContactPanel.add(searchField);
+                addNewContactPanel.add(addNewContactLabel);
+                addNewContactPanel.add(secondAddContactsLabel);
+                addNewContactPanel.add(newContact);
+                addNewContactPanel.add(nameFieldLabel);
+                addNewContactLabel.setBackground(Color.WHITE);
+                splitPane.setRightComponent(addNewContactPanel);
+                splitPane.repaint();
+                
+                //SET FOCUS LISTENER FOR THE SEARCH FIELD
+                    searchField.addFocusListener(
+                            new FocusListener() {
+
+                        @Override
+                        public void focusGained(FocusEvent event) {
+
+                            searchField.setText("");
+                            searchField.setEnabled(true);
+                            searchField.setEditable(true);
+                        }
+
+                        @Override
+                        public void focusLost(FocusEvent event) {
+
+                            searchField.setText("Search");
+                            searchField.setEditable(false);
+                        }
+                    }
+                    );
+
             }
         }
         );
@@ -1002,14 +1077,14 @@ public class InboxFrame2 extends JFrame implements AutoCloseable {
 
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/gmail", "root", "");
                 Statement mysqlStatements = connection.createStatement()) {
-            String INSERT_QUERY = "INSERT INTO contactsfor_" + currentUsersName + "VALUES('name','phone','email','address','Groups');";
+            String INSERT_QUERY = "INSERT INTO contactsfor_" + currentUsersName + "  VALUES('name','0721356432','email','address','Groups');";
             mysqlStatements.executeUpdate(INSERT_QUERY);
-            
+
             System.err.println("Contacts added succefully..");
-            
+
         } catch (SQLException e) {
-            
-            JOptionPane.showMessageDialog(null,"UNimessenger","404 ERROR"+e.getMessage(),JOptionPane.WARNING_MESSAGE);
+
+            JOptionPane.showMessageDialog(null, "404 ERROR" + e.getMessage(), "UniMessenger:", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -1050,7 +1125,7 @@ public class InboxFrame2 extends JFrame implements AutoCloseable {
     }
 
     //GET CURRENT LOGGED IN USER
-    public HashMap<String,String> getCurrentUser() {
+    public HashMap<String, String> getCurrentUser() {
 
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/gmail", "root", "");
                 Statement sqlStatmt = connection.createStatement()) {
@@ -1062,11 +1137,20 @@ public class InboxFrame2 extends JFrame implements AutoCloseable {
 
                 currentUser = queryResults.getString("currentLoggedInUser");
                 currentUsersEmail = queryResults.getString("userEmail");
-                currentUserData.put("usersName",currentUser);
-                currentUserData.put("usersEmail",currentUsersEmail);
+                currentUserData.put("usersName", currentUser);
+                currentUserData.put("usersEmail", currentUsersEmail);
+            }
+
+            //WRITE THIS DATA TO A BACKUP FILE
+            try (PrintWriter p_writer = new PrintWriter(new File("InstanceUserData.txt"))) {
+
+                p_writer.println("User Name:" + currentUser + "User Email" + currentUsersEmail);
+            } catch (IOException e) {
+
+                JOptionPane.showMessageDialog(null, "FILE 404 ERROR LINE 1077" + e.getMessage(), "UNimessenger", JOptionPane.WARNING_MESSAGE);
             }
             System.err.println("CURRENT USER'S DATA:\nUser Name :" + currentUser + "\nUser Email" + currentUsersEmail);
-            
+
             connection.close();
 
         } catch (SQLException e) {
