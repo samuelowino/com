@@ -8,4 +8,13 @@ package alpha.restaurant.management.system;
 
 public class MainUI {
     
+    public MainUI(){
+        setSize(500,500);
+        setLocation(0,0);
+        setResizable(false);
+        
+        repaint();
+        setVisible(true);
+        
+    }
 }
