@@ -3,6 +3,11 @@ import  java.security.*;
 import java.security.spec.InvalidkeySpecException;
 import javax.crypto.*;
 import sun.misc.*;
+ 
+ /*
+ AESEncryption class handles the specifics of symetric encryption using the 
+ Advanced Standard Algorithm.
+ **/
 
 public class AESEcnryption {
   
@@ -14,6 +19,9 @@ public class AESEcnryption {
     Key key = new SecretKeySpec(keyValue,algorithmDecalration);
     return key;
   }
+  /*
+  *@param plainText - this the plain text entered by user.
+  */
   
   public static String encrypt(String plainText) throws Exception{
     Key key = generateKey();
@@ -23,6 +31,10 @@ public class AESEcnryption {
     String encryptedValue = new BASE64Encoder().encode(encryptValue);
     return encryptedValue;
   }
+  
+  /*
+  *@param cipherText -String which is the cipher text that requires decryption.
+  */
   
   public static String decrypt(String cipherText) throws Exception{
     Key key = generateKey();
